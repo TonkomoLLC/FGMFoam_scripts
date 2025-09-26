@@ -1,0 +1,176 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+Build  : 7-3bcbaf946ae9
+Exec   : FGMFoam
+Date   : Sep 12 2025
+Time   : 13:31:56
+Host   : "aris"
+PID    : 3453467
+I/O    : uncollated
+Case   : /home/eadaymo/OpenFOAM/eadaymo-7/applications/fgmFoam/FGMFoam/03_testcase
+nProcs : 1
+sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 10)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+// using new solver syntax:
+p
+{
+    solver          PCG;
+    preconditioner
+    {
+        preconditioner  GAMG;
+        tolerance       2e-05;
+        relTol          0.05;
+        nVcycles        2;
+        smoother        GaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        nFinestSweeps   2;
+        cacheAgglomeration false;
+        nCellsInCoarsestLevel 300;
+        agglomerator    faceAreaPair;
+        mergeLevels     1;
+    }
+    tolerance       1e-06;
+    relTol          0.05;
+    maxIter         100;
+}
+
+// using new solver syntax:
+pFinal
+{
+    solver          PCG;
+    preconditioner
+    {
+        preconditioner  GAMG;
+        tolerance       2e-05;
+        relTol          0.05;
+        nVcycles        2;
+        smoother        GaussSeidel;
+        nPreSweeps      0;
+        nPostSweeps     2;
+        nFinestSweeps   2;
+        cacheAgglomeration false;
+        nCellsInCoarsestLevel 300;
+        agglomerator    faceAreaPair;
+        mergeLevels     1;
+    }
+    tolerance       1e-06;
+    relTol          0;
+    maxIter         100;
+}
+
+
+Reading g
+
+PIMPLE: No convergence criteria found
+
+
+PIMPLE: Operating solver in transient mode with 1 outer corrector
+PIMPLE: Operating solver in PISO mode
+
+
+Creating combustion model
+
+Selecting thermodynamics package 
+{
+    type            hePsiThermo;
+    mixture         reactingMixture;
+    transport       sutherland;
+    thermo          janaf;
+    energy          sensibleEnthalpy;
+    equationOfState perfectGas;
+    specie          specie;
+}
+
+Selecting chemistryReader chemkinReader
+Reading field U
+
+Reading/calculating face flux field phi
+
+Creating turbulence model.
+
+Selecting turbulence model type RAS
+Selecting RAS turbulence model kEpsilon
+RAS
+{
+    RASModel        kEpsilon;
+    turbulence      on;
+    printCoeffs     on;
+    Cmu             0.09;
+    C1              1.44;
+    C2              1.92;
+    C3              0;
+    sigmak          1;
+    sigmaEps        1.3;
+}
+
+Creating reaction model
+
+Selecting combustion model FGMModel
+Reading table: T
+Reading table: psi
+Reading table: mu
+Reading table: alpha
+Reading table: SourcePV
+Reading table: YWI
+Reading table: YuWI
+Reading table: YbWI
+Reading table: PVmin
+Reading table: PVmax
+Reading table: Yu2I
+Reading table: YuYbI
+Reading table: Yb2I
+
+Initializing unscaled progress variable
+
+Creating field dpdt
+
+Creating field kinetic energy K
+
+No MRF models present
+
+No finite volume options present
+Courant Number mean: 0.0063048927 max: 0.25756122
+
+Starting time loop
+
+Courant Number mean: 0.0063048927 max: 0.25756122
+Time = 5e-05
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 1, Final residual = 2.1689593e-09, No Iterations 3
+DILUPBiCG:  Solving for Uy, Initial residual = 0.99047733, Final residual = 3.239285e-07, No Iterations 2
+DILUPBiCG:  Solving for Uz, Initial residual = 1, Final residual = 4.104562e-09, No Iterations 3
+DILUPBiCG:  Solving for Z, Initial residual = 1, Final residual = 4.1150176e-09, No Iterations 3
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 1, Final residual = 1.3448878e-09, No Iterations 3
+PV min/max = 5.78283e-61/0.0095392668
+Entering FGMModel correct()
+T gas min/max = 294/1886.9162
+GAMGPCG:  Solving for p, Initial residual = 1, Final residual = 0.0048358955, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.020518769, Final residual = 0.00038999275, No Iterations 3
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 3.4309489e-06, global = -1.6646743e-08, cumulative = -1.6646743e-08
+GAMGPCG:  Solving for p, Initial residual = 0.0029028817, Final residual = 6.7612061e-05, No Iterations 3
+GAMGPCG:  Solving for p, Initial residual = 6.6820732e-05, Final residual = 9.4590177e-07, No Iterations 4
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 8.3086399e-09, global = -4.4503175e-09, cumulative = -2.109706e-08
+DILUPBiCG:  Solving for epsilon, Initial residual = 0.45425616, Final residual = 1.451703e-07, No Iterations 2
+DILUPBiCG:  Solving for k, Initial residual = 1, Final residual = 9.9425757e-07, No Iterations 2
+ExecutionTime = 0.31 s  ClockTime = 0 s
+
+End
+

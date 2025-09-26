@@ -6,9 +6,17 @@
 
 3. If you develop a set of working scripts for FGMFoam please kindly share with the community.
 
+# FGMFoam directory
 
+The original file is given here: https://www.tfd.chalmers.se/~hani/kurser/OS_CFD/ then replicated from https://github.com/drhcelik/fgmFoam. 
 
-# Instructions
+Original work: "Description of the reacting flow solver FGMFoam, Michael Bertsch"
+
+FGMFoam uses OpenFOAM 7.
+
+Warning warning warning - the scripts generated using the scripts below move the community forward, but do not fully work.
+
+# Script instructions
 
 **Flamelets → per-point CSV → (Z,PV) tables → OpenFOAM dictionaries**
 
