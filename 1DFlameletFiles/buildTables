@@ -1,0 +1,11 @@
+rm -f ../03_testcase/constant/tables/{mu_table,Cps_table,alpha_table,psi_table}
+
+python3 build_fgm_tables.py
+
+python3 csv2of_tables.py \
+  --in 02_tables.tar.xz \
+  --out ../03_testcase \
+  --tablePath constant/tables \
+  --mech ./gri30.yaml \
+  --pressure 101325 \
+  --rebuild-thermo

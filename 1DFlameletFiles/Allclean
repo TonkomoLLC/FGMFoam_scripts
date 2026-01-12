@@ -1,0 +1,8 @@
+rm 02_tables.tar.xz
+rm -r 02_tables
+rm -r ../03_testcase/constant/tables
+rm ../03_testcase/constant/tableProperties
+rm ../03_testcase/constant/PVtableProperties
+rm -r ../02_table
+rm *.csv
+rm *.yaml
