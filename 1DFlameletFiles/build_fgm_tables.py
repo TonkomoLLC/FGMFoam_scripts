@@ -331,7 +331,7 @@ def main():
     df = pd.concat(df_all, ignore_index=True)
 
     # -----------------------------
-    # grids (padded)  [MOVED UP: needed for PVmin/PVmax(Z)]
+    # grids (padded)  [needed for PVmin/PVmax(Z)]
     # -----------------------------
     Zgrid = _build_padded_axis(NZ, PAD_EPS)
     PVgrid = _build_padded_axis(NPV, PAD_EPS)
@@ -349,26 +349,31 @@ def main():
     rho = np.where(np.isfinite(rho), rho, RHO_FLOOR)
     rho = np.maximum(RHO_FLOOR, rho)
 
-    # T: keep finite; NaNs will be handled by bin fill later
+    # T: keep as-is (NaNs are handled by _favre_bin_2d finite-masking + fill)
     T = df["T"].to_numpy(dtype=float)
 
     # PV raw: keep as-is (finite mask handled in bounds + normalization)
     PV_raw = df["PV"].to_numpy(dtype=float)
 
+    # SourcePV: sanitize to finite (don’t normalize)
+    if have_sourcepv:
+        SourcePV = df[sourcepv_col].to_numpy(dtype=float)
+        SourcePV = np.where(np.isfinite(SourcePV), SourcePV, 0.0)
+    else:
+        SourcePV = None
+
     # Compute Z-dependent PVmin/PVmax vectors aligned with Zgrid
-    # Use a slightly higher min_per_bin than MIN_BIN_COUNT because percentile estimates
-    # are noisy with too few samples.
     PVmin_vec, PVmax_vec = _compute_pv_bounds_per_Z(
         Z=Z,
         PV_raw=PV_raw,
         Zgrid=Zgrid,
-        pv_lo_q=0.0,                    # you can change to e.g. 0.5 if you want
+        pv_lo_q=0.0,
         pv_hi_q=PV_HI_PERCENTILE,
         min_per_bin=max(20, MIN_BIN_COUNT),
         span_floor=1e-30,
     )
 
-    # Interpolate PVmin(Z), PVmax(Z) to each sample's Z (use interior Z grid for interpolation)
+    # Interpolate PVmin(Z), PVmax(Z) to each sample's Z
     Z_int = Zgrid[1:-1]  # [0..1]
     pvmin_at_Z = np.interp(Z, Z_int, PVmin_vec[1:-1], left=PVmin_vec[1], right=PVmin_vec[-2])
     pvmax_at_Z = np.interp(Z, Z_int, PVmax_vec[1:-1], left=PVmax_vec[1], right=PVmax_vec[-2])
@@ -379,12 +384,24 @@ def main():
     PV = np.where(np.isfinite(PV), PV, 0.0)
     PV = np.clip(PV, 0.0, 1.0)
 
-    # Optional SourcePV: just sanitize to finite (don’t normalize)
-    if have_sourcepv:
-        SourcePV = df[sourcepv_col].to_numpy(dtype=float)
-        SourcePV = np.where(np.isfinite(SourcePV), SourcePV, 0.0)
-    else:
-        SourcePV = None
+    # --- OPTIONAL AUTO-FLIP: ensure PV increases with progress (T) ---
+    pv_flipped = False
+    good = np.isfinite(PV) & np.isfinite(T) & (PV > 1e-12) & (PV < 1.0 - 1e-12)
+    if np.count_nonzero(good) <= 100:
+        good = np.isfinite(PV) & np.isfinite(T)
+
+    if np.count_nonzero(good) > 100:
+        corr = np.corrcoef(PV[good], T[good])[0, 1]
+        if np.isfinite(corr) and corr < 0.0:
+            pv_flipped = True
+            print(f"[WARN] PV appears anti-correlated with T (corr={corr:.3f}); flipping PV axis.")
+            PV = 1.0 - PV
+            PV = np.clip(PV, 0.0, 1.0)
+            PVmin_vec, PVmax_vec = PVmax_vec.copy(), PVmin_vec.copy()
+
+            # If SourcePV is d(PV)/dt for this PV definition, it must flip sign too
+            if have_sourcepv and SourcePV is not None:
+                SourcePV = -SourcePV
 
     # For metadata: report global min and the chosen global percentile (informational)
     pv_finite = PV_raw[np.isfinite(PV_raw)]
@@ -395,7 +412,6 @@ def main():
         pv_lo = float(np.min(pv_finite))
         pv_hi = float(np.percentile(pv_finite, PV_HI_PERCENTILE))
 
-
     # -----------------------------
     # build thermo tables
     # -----------------------------
@@ -405,7 +421,7 @@ def main():
     rho_tbl, _ = _favre_bin_2d(Z, PV, rho, rho, Zgrid, PVgrid, MIN_BIN_COUNT)
     rho_tbl = _pad_extrapolate_const(_nearest_fill(rho_tbl))
 
-    if have_sourcepv:
+    if have_sourcepv and SourcePV is not None:
         spv_tbl, _ = _favre_bin_2d(Z, PV, rho, SourcePV, Zgrid, PVgrid, MIN_BIN_COUNT)
         spv_tbl = _pad_extrapolate_const(_nearest_fill(spv_tbl))
         print(f"[INFO] Using PV source column '{sourcepv_col}' to build thermo/SourcePV.csv")
@@ -457,9 +473,10 @@ def main():
             "PV_HI_PERCENTILE": float(PV_HI_PERCENTILE),
             "rho_floor": float(RHO_FLOOR),
             "pv_raw_min": float(pv_lo),
-            "pv_raw_hi_percentile": float(pv_hi),            
+            "pv_raw_hi_percentile": float(pv_hi),
             "pvmin_vec_min": float(np.min(PVmin_vec)),
             "pvmax_vec_max": float(np.max(PVmax_vec)),
+            "pv_flipped": bool(pv_flipped),
             "sourcepv_col": sourcepv_col if have_sourcepv else None,
         },
         "source": files,
@@ -490,8 +507,10 @@ def main():
     print(f"Wrote {OUT_TAR}")
     print(f"  axes:     NZ={len(Zgrid)}  NPV={len(PVgrid)}  (padded eps={PAD_EPS:g})")
     print(f"  PV norm:  pv_lo={pv_lo:.6e}, pv_hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}")
+    print(f"  PV flip:  {'YES' if pv_flipped else 'no'}")
     print(f"  SourcePV: {'from ' + sourcepv_col if have_sourcepv else 'ZEROS'}")
     print(f"  species:  {len(species_tables)} tables")
+
 
 
 

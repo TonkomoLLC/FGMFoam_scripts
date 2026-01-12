@@ -22,7 +22,7 @@ diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterati
 time step continuity errors : sum local = 4.8177431e-10, global = 6.273535e-11, cumulative = -0.00032776558
 DILUPBiCG:  Solving for epsilon, Initial residual = 0.0003223984, Final residual = 8.2226442e-08, No Iterations 1
 DILUPBiCG:  Solving for k, Initial residual = 0.00048638066, Final residual = 1.6385945e-07, No Iterations 1
-ExecutionTime = 41.5 s  ClockTime = 41 s
+ExecutionTime = 41.1 s  ClockTime = 41 s
 
 Courant Number mean: 0.12291582 max: 0.66556766
 Time = 0.09995
@@ -48,7 +48,7 @@ diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterati
 time step continuity errors : sum local = 1.6194236e-09, global = 1.4248341e-10, cumulative = -0.00032775953
 DILUPBiCG:  Solving for epsilon, Initial residual = 0.0003211644, Final residual = 8.2428235e-08, No Iterations 1
 DILUPBiCG:  Solving for k, Initial residual = 0.00048489467, Final residual = 1.6247908e-07, No Iterations 1
-ExecutionTime = 41.52 s  ClockTime = 41 s
+ExecutionTime = 41.12 s  ClockTime = 41 s
 
 Courant Number mean: 0.12228135 max: 0.6727927
 Time = 0.1
@@ -74,6 +74,7 @@ diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterati
 time step continuity errors : sum local = 1.5369152e-09, global = -5.5046348e-11, cumulative = -0.00032774444
 DILUPBiCG:  Solving for epsilon, Initial residual = 0.0003200792, Final residual = 8.0621962e-08, No Iterations 1
 DILUPBiCG:  Solving for k, Initial residual = 0.00048351837, Final residual = 1.6102111e-07, No Iterations 1
-ExecutionTime = 41.56 s  ClockTime = 41 s
+ExecutionTime = 41.15 s  ClockTime = 41 s
 
 End
+
