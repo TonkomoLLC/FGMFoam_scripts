@@ -3,7 +3,7 @@ This script takes the CSV FGM tables from `02_tables` and converts them into Ope
 ## Role in the workflow
 
 In the overall pipeline:
-- `build_fgm_tables.py` produced a tar/dir with 2D arrays \(T(Z,PV)\), \(\rho(Z,PV)\), \(Y_k(Z,PV)\), `SourcePV`, and the corresponding axes and PV bounds.[2][1]
+- `build_fgm_tables.py` produced a tar/dir with 2D arrays $T(Z,PV)$, $\rho(Z,PV)$, $Y_k(Z,PV)$, `SourcePV`, and the corresponding axes and PV bounds.[2][1]
 - `csv2of_tables.py` reads those CSVs (either from `02_tables.tar.xz` or a `02_tables/` folder) and writes OpenFOAM-format **table dictionaries** in the target case directory, ready for FGMFoam’s table solvers.[1]
 
 Conceptually, it maps the continuous FGM library into the specific nested list layout and metadata (dimensions, variable parameters, tablePath, etc.) that OpenFOAM’s `tableSolver` and `PVtableSolver` expect.[1]
@@ -62,7 +62,7 @@ The dimension strings are set according to OpenFOAM’s unit system, e.g.:
 
 - `tableProperties`:
   - `tablePath` (from `--tablePath`, default `"tables"`; automatically normalized so that bare `"tables"` becomes `"constant/tables"` in the file).[1]
-  - `interpolationType linearInterpolation;` for standard 2D interpolation in \((Z,PV)\).[1]
+  - `interpolationType linearInterpolation;` for standard 2D interpolation in $(Z,PV)$.[1]
   - `varPV_param` and `varZ_param` as lists, plus `PV_param` and `Z_param` containing the actual axes arrays.[1]
 
 - `PVtableProperties`:
@@ -102,7 +102,7 @@ In plain language:
   - A directory (e.g. `constant/tables/`) full of `*_table` files: temperature, density, compressibility, viscosity, heat capacity, thermal diffusivity, PV source, and species mass fractions, all tabulated as functions of Z and PV.[1]
   - Additional PV bounds tables `PVmin_table` and `PVmax_table` that allow the PVtableSolver to map normalized PV back to physical progress-variable values per mixture fraction.[1]
 
-From the solver’s perspective, once these files exist, FGMFoam can reconstruct local thermochemical states at each cell, solely from the transported scalars \(Z\) and \(PV\), without ever calling Cantera during the CFD run.[1]
+From the solver’s perspective, once these files exist, FGMFoam can reconstruct local thermochemical states at each cell, solely from the transported scalars $Z$ and $PV$, without ever calling Cantera during the CFD run.[1]
 
 [1]csv2of_tables.py
 [2]build_fgm_tables.py
