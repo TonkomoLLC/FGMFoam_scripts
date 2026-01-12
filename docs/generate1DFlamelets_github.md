@@ -16,13 +16,20 @@ The transport model is mixture-averaged or multicomponent, so diffusion fluxes a
 In simplified form, the model solves along the axial coordinate $z$:
 
 - Continuity (steady 1D):
-  - $ \dfrac{d}{dz}(\rho u) = 0 $, so the mass flux $ \rho u $ is constant across the domain.
+  - $$
+\frac{d}{dz}(\rho u) = 0
+$$, so the mass flux $ \rho u $ is constant across the domain.
 
 - Species $Y_k$ for each species $k$:
-  - $ \rho u \dfrac{dY_k}{dz} = - \dfrac{d j_k}{dz} + \dot{\omega}_k W_k $, where $j_k$ is the diffusive mass flux and $\dot{\omega}_k$ is the molar production rate from chemistry.
+  - $$
+\rho u \frac{dY_k}{dz} = - \frac{d j_k}{dz} + \dot{\omega}_k W_k
+$$, where $j_k$ is the diffusive mass flux and $\dot{\omega}_k$ is the molar production rate from chemistry.
 
 - Energy (in terms of temperature $T$ or mixture enthalpy):
-  - $ \rho u c_p \dfrac{dT}{dz} = - \dfrac{dq}{dz} - \sum_k h_k \dfrac{d j_k}{dz} $, where $q$ is conductive heat flux and $h_k$ are species enthalpies.
+  - $$
+\rho u c_p \frac{dT}{dz} = - \frac{dq}{dz} - \sum_k h_k \frac{d j_k}{dz}
+$$, where $q$ is conductive heat flux and $h_k$$
+are species enthalpies.
 
 The velocity and strain appear via the similarity formulation inside `CounterflowDiffusionFlame`; for the user, the “knob” is the inlet mass fluxes that set the effective strain rate.
 
@@ -48,7 +55,10 @@ With the base flame lit and recentered:
 - It then enters a loop (up to `max_steps`) where each iteration attempts to increase the total mass flux by a factor `strain_factor` (e.g., 1.10).
 
 Adaptive stepping (`adaptive_step_solve`):
-- The code computes the current total mass flux $M_0$ and inflow mass flux ratio $r_0 = \dot{m}_{ox}/\dot{m}_{fuel}$.
+- The code computes the current total mass flux
+$$M_0$ and inflow mass flux ratio $$
+r_0 = \dot{m}_{ox}/\dot{m}_{fuel}
+$$.
 - It tries a series of fractional steps (1.0, 0.8, 0.65, 0.5, 0.35) between the current state and the target increase.
 - For each attempt, it scales the total mass flux by a factor `sf` while preserving the ratio $r_0$ and solves the flame, using `set_refine_criteria` to adjust grid refinement.
 - A step is accepted if the solve converges and the new maximum temperature exceeds `min_T_accept` (1200 K), which indicates a robustly burning flame; otherwise, the code tries a smaller effective step.
