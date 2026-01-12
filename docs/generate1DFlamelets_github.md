@@ -16,7 +16,7 @@ The transport model is mixture-averaged or multicomponent, so diffusion fluxes a
 In simplified form, the model solves along the axial coordinate $z$:
 
 - Continuity (steady 1D):
-  - $$ \frac{d}{dz}(\rho u) = 0$$, so the mass flux $ \rho u $ is constant across the domain.
+  - $$\frac{d}{dz}(\rho u) = 0$$, so the mass flux $ \rho u $ is constant across the domain.
 
 - Species $Y_k$ for each species $k$:
   - $$\rho u \frac{dY_k}{dz} = - \frac{d j_k}{dz} + \dot{\omega}_k W_k$$, where $j_k$ is the diffusive mass flux and $\dot{\omega}_k$ is the molar production rate from chemistry.
