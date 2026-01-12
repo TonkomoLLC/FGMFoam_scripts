@@ -74,6 +74,7 @@ def _favre_bin_2d(Z, PV, rho, field, Zgrid, PVgrid, min_count=6):
     NZg, NPVg = len(Zgrid), len(PVgrid)
     table = np.full((NZg, NPVg), np.nan, float)
 
+    # Bin boundaries (midpoints) in axis-space
     Zb = (Zgrid[:-1] + Zgrid[1:]) / 2.0
     PVb = (PVgrid[:-1] + PVgrid[1:]) / 2.0
 
@@ -84,8 +85,15 @@ def _favre_bin_2d(Z, PV, rho, field, Zgrid, PVgrid, min_count=6):
     PVi = np.clip(PVi, 0, NPVg - 1)
 
     flat_idx = Zi * NPVg + PVi
+
     w = rho.astype(float)
     f = field.astype(float)
+
+    # IMPORTANT: filter non-finite values BEFORE bincount (prevents NaN poisoning)
+    good = np.isfinite(flat_idx) & np.isfinite(w) & np.isfinite(f) & np.isfinite(Z) & np.isfinite(PV)
+    flat_idx = flat_idx[good].astype(np.int64, copy=False)
+    w = w[good]
+    f = f[good]
 
     den = np.bincount(flat_idx, weights=w, minlength=NZg * NPVg).reshape(NZg, NPVg)
     num = np.bincount(flat_idx, weights=w * f, minlength=NZg * NPVg).reshape(NZg, NPVg)
@@ -94,7 +102,6 @@ def _favre_bin_2d(Z, PV, rho, field, Zgrid, PVgrid, min_count=6):
     mask = (counts >= int(min_count)) & (den > 0.0)
     table[mask] = num[mask] / den[mask]
     return table, counts
-
 
 def _nearest_fill(table: np.ndarray) -> np.ndarray:
     """Nearest-neighbor fill for NaNs (index-space)."""
@@ -141,11 +148,113 @@ def _add_text(tf: tarfile.TarFile, path: Path, text: str):
     tf.addfile(info, io.BytesIO(data))
 
 
-def _pick_sourcepv_column(df: pd.DataFrame):
-    for c in SOURCEPV_CANDIDATES:
-        if c in df.columns:
-            return c
-    return None
+def _robust_percentile(x: np.ndarray, q: float):
+    x = x[np.isfinite(x)]
+    if x.size == 0:
+        return np.nan
+    return float(np.percentile(x, q))
+
+
+def _compute_pv_bounds_per_Z(
+    Z: np.ndarray,
+    PV_raw: np.ndarray,
+    Zgrid: np.ndarray,
+    pv_lo_q: float = 0.0,
+    pv_hi_q: float = 99.5,
+    min_per_bin: int = 20,
+    span_floor: float = 1e-30,
+):
+    """
+    Compute PVmin(Z) and PVmax(Z) vectors aligned with Zgrid (including padded rows).
+
+    Strategy:
+      - Use interior Z bins (exclude padding endpoints).
+      - For each Z bin, compute PV percentiles [pv_lo_q, pv_hi_q] from samples in that bin.
+      - Fill missing bins by nearest-in-index fill.
+      - Enforce pvmax > pvmin everywhere (span_floor).
+      - Constant-extrapolate into padded Z rows (Zgrid[0], Zgrid[-1]).
+    """
+    NZg = len(Zgrid)
+    if NZg < 3:
+        raise ValueError("Zgrid must include padding (len>=3).")
+
+    # interior bin edges: use the interior axis (Zgrid[1:-1]) which is [0..1]
+    Z_int = Zgrid[1:-1]
+    n_int = len(Z_int)
+
+    # define Z-bin edges halfway between interior points
+    Z_edges = np.empty(n_int + 1, dtype=float)
+    Z_edges[1:-1] = 0.5 * (Z_int[:-1] + Z_int[1:])
+    Z_edges[0] = -np.inf
+    Z_edges[-1] = np.inf
+
+    pvmin_int = np.full(n_int, np.nan, dtype=float)
+    pvmax_int = np.full(n_int, np.nan, dtype=float)
+
+    # bin index for each sample into interior bins
+    Zi = np.searchsorted(Z_edges, Z, side="right") - 1
+    Zi = np.clip(Zi, 0, n_int - 1)
+
+    for i in range(n_int):
+        mask = (Zi == i) & np.isfinite(PV_raw)
+        if np.count_nonzero(mask) < int(min_per_bin):
+            continue
+        pvl = _robust_percentile(PV_raw[mask], pv_lo_q)
+        pvh = _robust_percentile(PV_raw[mask], pv_hi_q)
+        pvmin_int[i] = pvl
+        pvmax_int[i] = pvh
+
+    # Fill missing bins (nearest in index space)
+    def _nearest_1d_fill(v):
+        out = v.copy()
+        nan = ~np.isfinite(out)
+        if not np.any(nan):
+            return out
+        known_idx = np.where(np.isfinite(out))[0]
+        if known_idx.size == 0:
+            return out
+        for j in np.where(nan)[0]:
+            k = known_idx[np.argmin((known_idx - j) ** 2)]
+            out[j] = out[k]
+        return out
+
+    pvmin_int = _nearest_1d_fill(pvmin_int)
+    pvmax_int = _nearest_1d_fill(pvmax_int)
+
+    # If still all-NaN (e.g. PV_raw all NaN), fall back safely
+    if not np.isfinite(pvmin_int).any() or not np.isfinite(pvmax_int).any():
+        pv_global = PV_raw[np.isfinite(PV_raw)]
+        if pv_global.size == 0:
+            pv_lo = 0.0
+            pv_hi = 1.0
+        else:
+            pv_lo = float(np.min(pv_global))
+            pv_hi = float(np.percentile(pv_global, pv_hi_q))
+        pvmin_int[:] = pv_lo
+        pvmax_int[:] = pv_hi
+
+    # Enforce strictly positive span everywhere
+    span = pvmax_int - pvmin_int
+    bad = (~np.isfinite(span)) | (span <= span_floor)
+    if np.any(bad):
+        # widen around pvmin_int
+        pvmax_int[bad] = pvmin_int[bad] + span_floor
+
+    # Build full vectors aligned with Zgrid (including padding)
+    pvmin_vec = np.empty(NZg, dtype=float)
+    pvmax_vec = np.empty(NZg, dtype=float)
+    pvmin_vec[1:-1] = pvmin_int
+    pvmax_vec[1:-1] = pvmax_int
+
+    # constant-extrapolate into padded rows
+    pvmin_vec[0] = pvmin_vec[1]
+    pvmin_vec[-1] = pvmin_vec[-2]
+    pvmax_vec[0] = pvmax_vec[1]
+    pvmax_vec[-1] = pvmax_vec[-2]
+
+    # Final safety
+    pvmax_vec = np.maximum(pvmax_vec, pvmin_vec + span_floor)
+    return pvmin_vec, pvmax_vec
 
 
 def main():
@@ -222,41 +331,70 @@ def main():
     df = pd.concat(df_all, ignore_index=True)
 
     # -----------------------------
-    # sanitize / normalize inputs
+    # grids (padded)  [MOVED UP: needed for PVmin/PVmax(Z)]
     # -----------------------------
-    Z = np.clip(df["Z"].to_numpy(dtype=float), 0.0, 1.0)
+    Zgrid = _build_padded_axis(NZ, PAD_EPS)
+    PVgrid = _build_padded_axis(NPV, PAD_EPS)
 
-    PV_raw = df["PV"].to_numpy(dtype=float)
-    pv_lo = float(np.nanmin(PV_raw))
-    pv_hi = float(np.nanpercentile(PV_raw, PV_HI_PERCENTILE))
-    pv_span = pv_hi - pv_lo
-    if not np.isfinite(pv_span) or pv_span <= 0.0:
-        PV = np.zeros_like(PV_raw, dtype=float)
-    else:
-        PV = np.clip((PV_raw - pv_lo) / max(1e-30, pv_span), 0.0, 1.0)
+    # -----------------------------
+    # sanitize / normalize inputs  (Z-dependent PV normalization)
+    # -----------------------------
+    # Z: clip hard to [0,1]
+    Z = df["Z"].to_numpy(dtype=float)
+    Z = np.where(np.isfinite(Z), Z, 0.0)
+    Z = np.clip(Z, 0.0, 1.0)
 
+    # rho: finite + floor (Favre weights)
     rho = df["rho"].to_numpy(dtype=float)
     rho = np.where(np.isfinite(rho), rho, RHO_FLOOR)
     rho = np.maximum(RHO_FLOOR, rho)
 
+    # T: keep finite; NaNs will be handled by bin fill later
     T = df["T"].to_numpy(dtype=float)
 
-    # optional SourcePV
+    # PV raw: keep as-is (finite mask handled in bounds + normalization)
+    PV_raw = df["PV"].to_numpy(dtype=float)
+
+    # Compute Z-dependent PVmin/PVmax vectors aligned with Zgrid
+    # Use a slightly higher min_per_bin than MIN_BIN_COUNT because percentile estimates
+    # are noisy with too few samples.
+    PVmin_vec, PVmax_vec = _compute_pv_bounds_per_Z(
+        Z=Z,
+        PV_raw=PV_raw,
+        Zgrid=Zgrid,
+        pv_lo_q=0.0,                    # you can change to e.g. 0.5 if you want
+        pv_hi_q=PV_HI_PERCENTILE,
+        min_per_bin=max(20, MIN_BIN_COUNT),
+        span_floor=1e-30,
+    )
+
+    # Interpolate PVmin(Z), PVmax(Z) to each sample's Z (use interior Z grid for interpolation)
+    Z_int = Zgrid[1:-1]  # [0..1]
+    pvmin_at_Z = np.interp(Z, Z_int, PVmin_vec[1:-1], left=PVmin_vec[1], right=PVmin_vec[-2])
+    pvmax_at_Z = np.interp(Z, Z_int, PVmax_vec[1:-1], left=PVmax_vec[1], right=PVmax_vec[-2])
+    span_at_Z = np.maximum(1e-30, pvmax_at_Z - pvmin_at_Z)
+
+    # Normalize PV to [0,1] using local bounds
+    PV = (PV_raw - pvmin_at_Z) / span_at_Z
+    PV = np.where(np.isfinite(PV), PV, 0.0)
+    PV = np.clip(PV, 0.0, 1.0)
+
+    # Optional SourcePV: just sanitize to finite (don’t normalize)
     if have_sourcepv:
         SourcePV = df[sourcepv_col].to_numpy(dtype=float)
         SourcePV = np.where(np.isfinite(SourcePV), SourcePV, 0.0)
     else:
         SourcePV = None
 
-    # -----------------------------
-    # grids (padded)
-    # -----------------------------
-    Zgrid = _build_padded_axis(NZ, PAD_EPS)
-    PVgrid = _build_padded_axis(NPV, PAD_EPS)
+    # For metadata: report global min and the chosen global percentile (informational)
+    pv_finite = PV_raw[np.isfinite(PV_raw)]
+    if pv_finite.size == 0:
+        pv_lo = 0.0
+        pv_hi = 1.0
+    else:
+        pv_lo = float(np.min(pv_finite))
+        pv_hi = float(np.percentile(pv_finite, PV_HI_PERCENTILE))
 
-    # PV bounds vectors aligned with Zgrid (physical PV units)
-    PVmin_vec = np.full((len(Zgrid),), pv_lo, dtype=float)
-    PVmax_vec = np.full((len(Zgrid),), pv_hi, dtype=float)
 
     # -----------------------------
     # build thermo tables
@@ -319,7 +457,9 @@ def main():
             "PV_HI_PERCENTILE": float(PV_HI_PERCENTILE),
             "rho_floor": float(RHO_FLOOR),
             "pv_raw_min": float(pv_lo),
-            "pv_raw_hi_percentile": float(pv_hi),
+            "pv_raw_hi_percentile": float(pv_hi),            
+            "pvmin_vec_min": float(np.min(PVmin_vec)),
+            "pvmax_vec_max": float(np.max(PVmax_vec)),
             "sourcepv_col": sourcepv_col if have_sourcepv else None,
         },
         "source": files,

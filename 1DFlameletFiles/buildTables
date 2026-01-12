@@ -1,6 +1,6 @@
-rm -f ../03_testcase/constant/tables/{mu_table,Cps_table,alpha_table,psi_table}
+rm -f ../03_testcase/constant/tables/{mu_table,Cps_table,alpha_table,psi_table,PVmin_table,PVmax_table}
 
-python3 build_fgm_tables.py
+python3 build_fgm_tables.py   # <-- must write axes/PVmin.csv and axes/PVmax.csv into 02_tables.tar.xz
 
 python3 csv2of_tables.py \
   --in 02_tables.tar.xz \
@@ -8,4 +8,6 @@ python3 csv2of_tables.py \
   --tablePath constant/tables \
   --mech ./gri30.yaml \
   --pressure 101325 \
-  --rebuild-thermo
+  --rebuild-thermo \
+  --varZ 0 0.25 0.5 0.75 1 \
+  --varPV 0 0.1 0.2 0.5 1
