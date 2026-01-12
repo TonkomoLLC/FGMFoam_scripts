@@ -45,9 +45,9 @@ timePrecision   7;
 
 runTimeModifiable true;
 
-adjustTimeStep    on;
+adjustTimeStep    off;
 
-maxCo           0.2;
+maxCo           0.5;
 
 maxDeltaT       1e-4;          // keep small until the flow settles
 
