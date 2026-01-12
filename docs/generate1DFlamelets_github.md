@@ -16,20 +16,13 @@ The transport model is mixture-averaged or multicomponent, so diffusion fluxes a
 In simplified form, the model solves along the axial coordinate $z$:
 
 - Continuity (steady 1D):
-  - $$
-\frac{d}{dz}(\rho u) = 0
-$$, so the mass flux $ \rho u $ is constant across the domain.
+  - $$ \frac{d}{dz}(\rho u) = 0$$, so the mass flux $ \rho u $ is constant across the domain.
 
 - Species $Y_k$ for each species $k$:
-  - $$
-\rho u \frac{dY_k}{dz} = - \frac{d j_k}{dz} + \dot{\omega}_k W_k
-$$, where $j_k$ is the diffusive mass flux and $\dot{\omega}_k$ is the molar production rate from chemistry.
+  - $$\rho u \frac{dY_k}{dz} = - \frac{d j_k}{dz} + \dot{\omega}_k W_k$$, where $j_k$ is the diffusive mass flux and $\dot{\omega}_k$ is the molar production rate from chemistry.
 
 - Energy (in terms of temperature $T$ or mixture enthalpy):
-  - $$
-\rho u c_p \frac{dT}{dz} = - \frac{dq}{dz} - \sum_k h_k \frac{d j_k}{dz}
-$$, where $q$ is conductive heat flux and $h_k$$
-are species enthalpies.
+  - $$\rho u c_p \frac{dT}{dz} = - \frac{dq}{dz} - \sum_k h_k \frac{d j_k}{dz}$$, where $q$ is conductive heat flux and $h_k$$ are species enthalpies.
 
 The velocity and strain appear via the similarity formulation inside `CounterflowDiffusionFlame`; for the user, the “knob” is the inlet mass fluxes that set the effective strain rate.
 
