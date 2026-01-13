@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         0.5;
 
 deltaT          5e-5;          // start much smaller than 5e-5
 

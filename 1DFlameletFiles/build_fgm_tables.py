@@ -585,6 +585,7 @@ def _diag_pvT_quantiles_byZ(
     return corr_med, tlo_med, thi_med, used
 
 
+
 def main():
     files = sorted(glob.glob(POST_GLOB))
     if not files:
@@ -597,7 +598,7 @@ def main():
 
     first_species_order = None
     species_intersection = None
-    sourcepv_intersection = None
+    sourcepv_intersection = None  # candidates present in ALL files
 
     for fn in files:
         dfi = pd.read_csv(fn)
@@ -664,7 +665,7 @@ def main():
         SourcePV_raw = np.where(np.isfinite(SourcePV_raw), SourcePV_raw, 0.0)
 
     # -----------------------------
-    # Build axes (Z from data range; PV axis is normalized [0..1])
+    # Build axes
     # -----------------------------
     Z_finite = Z[np.isfinite(Z)]
     if Z_finite.size == 0:
@@ -692,101 +693,45 @@ def main():
     print(f"[DIAG] Z axis range: data [{Z_lo:.6g}, {Z_hi:.6g}]  |  axis [{Zgrid[0]:.6g}, {Zgrid[-1]:.6g}]")
 
     # -----------------------------
-    # PV RAW stats (compute EARLY; needed for global normalization)
+    # GLOBAL PV normalization (this is what gave you the “so close” result)
     # -----------------------------
     pv_finite = PV_raw[np.isfinite(PV_raw)]
     if pv_finite.size == 0:
-        raise SystemExit("All PV_raw are non-finite; cannot normalize PV.")
-    pv_lo = float(np.min(pv_finite))
-    pv_hi = float(np.percentile(pv_finite, PV_HI_PERCENTILE))
-    if not np.isfinite(pv_hi) or pv_hi <= pv_lo:
-        pv_hi = pv_lo + 1e-12
-
-    # -----------------------------
-    # Choose PV normalization method
-    #   - GLOBAL: same PVmin/PVmax for all Z
-    #   - PER-Z : PVmin(Z), PVmax(Z) (your earlier windowed method)
-    # -----------------------------
-    USE_GLOBAL_PV = bool(globals().get("USE_GLOBAL_PV", True))  # default True
-
-    if USE_GLOBAL_PV:
-        pvmin_global = pv_lo
-        pvmax_global = pv_hi
-        pv_span = max(1e-30, pvmax_global - pvmin_global)
-
-        PV = (PV_raw - pvmin_global) / pv_span
-        PV = np.where(np.isfinite(PV), PV, 0.0)
-        PV = np.clip(PV, 0.0, 1.0)
-
-        PVmin_vec = np.full_like(Zgrid, pvmin_global, dtype=float)
-        PVmax_vec = np.full_like(Zgrid, pvmax_global, dtype=float)
-
-        print(f"[DIAG] PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}")
-        print(f"[DIAG] PV span (global) = {pv_span:.6e}")
-
+        pv_lo = 0.0
+        pv_hi = 1.0
     else:
-        n_total = int(np.count_nonzero(np.isfinite(PV_raw) & np.isfinite(Z)))
-        n_int = len(Zgrid) - 2
-        min_per_bin_bounds = int(np.clip(n_total // max(1, n_int), 50, 300))
+        pv_lo = float(np.min(pv_finite))
+        pv_hi = float(np.percentile(pv_finite, PV_HI_PERCENTILE))
 
-        PVmin_vec, PVmax_vec = _compute_pv_bounds_per_Z(
-            Z=Z,
-            PV_raw=PV_raw,
-            Zgrid=Zgrid,
-            pv_lo_q=0.0,
-            pv_hi_q=PV_HI_PERCENTILE,
-            min_per_bin=min_per_bin_bounds,
-            span_floor=1e-30,
-        )
+    pv_span = max(1e-30, pv_hi - pv_lo)
 
-        def _smooth_1d(v, win=9):
-            win = int(max(3, win))
-            if win % 2 == 0:
-                win += 1
-            k = np.ones(win, dtype=float) / win
-            out = v.copy()
-            out[1:-1] = np.convolve(v[1:-1], k, mode="same")
-            out[0] = out[1]
-            out[-1] = out[-2]
-            return out
+    PV = (PV_raw - pv_lo) / pv_span
+    PV = np.where(np.isfinite(PV), PV, 0.0)
+    PV = np.clip(PV, 0.0, 1.0)
 
-        PVmin_vec = _smooth_1d(PVmin_vec, win=9)
-        PVmax_vec = _smooth_1d(PVmax_vec, win=9)
-        PVmax_vec = np.maximum(PVmax_vec, PVmin_vec + 1e-30)
+    # PVmin/PVmax vectors are in *physical PV units* for metadata/reconstruction
+    PVmin_vec = np.full(len(Zgrid), pv_lo, dtype=float)
+    PVmax_vec = np.full(len(Zgrid), pv_hi, dtype=float)
 
-        Z_int = Zgrid[1:-1]
-        pvmin_at_Z = np.interp(Z, Z_int, PVmin_vec[1:-1], left=PVmin_vec[1], right=PVmin_vec[-2])
-        pvmax_at_Z = np.interp(Z, Z_int, PVmax_vec[1:-1], left=PVmax_vec[1], right=PVmax_vec[-2])
-        span_at_Z = np.maximum(1e-30, pvmax_at_Z - pvmin_at_Z)
-
-        PV = (PV_raw - pvmin_at_Z) / span_at_Z
-        PV = np.where(np.isfinite(PV), PV, 0.0)
-        PV = np.clip(PV, 0.0, 1.0)
-
-        print(f"[DIAG] PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}")
-        print(f"[DIAG] PV span(Z): min={float(np.min(PVmax_vec-PVmin_vec)):.6e}, "
-              f"max={float(np.max(PVmax_vec-PVmin_vec)):.6e}")
+    print(f"[DIAG] PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}")
+    print(f"[DIAG] PV span (global) = {pv_span:.6e}")
 
     # -----------------------------
-    # PV ORIENTATION (flip PV and SourcePV consistently)
+    # PV orientation handling
     # -----------------------------
     flipped = False
     FORCE_PV_FLIP = bool(globals().get("FORCE_PV_FLIP", False))
     DISABLE_AUTO_FLIP = bool(globals().get("DISABLE_AUTO_FLIP", False))
 
-    def _apply_flip():
-        nonlocal PV, SourcePV_raw, flipped
-        PV = 1.0 - PV
-        PV = np.clip(PV, 0.0, 1.0)
-        if have_sourcepv and (SourcePV_raw is not None):
-            SourcePV_raw = -SourcePV_raw
-        flipped = True
-
     if FORCE_PV_FLIP:
         print("[WARN] FORCE_PV_FLIP=True: flipping PV and SourcePV sign.")
-        _apply_flip()
+        PV = 1.0 - PV
+        flipped = True
+        if have_sourcepv and (SourcePV_raw is not None):
+            SourcePV_raw = -SourcePV_raw
+
     elif (have_sourcepv and (SourcePV_raw is not None) and not DISABLE_AUTO_FLIP):
-        # Prefer SourcePV sign check in a representative interior region
+        # Only flip if SourcePV is *overwhelmingly* negative in the interior.
         zmask = (Z >= Zgrid[2]) & (Z <= Zgrid[-3])
         pvmask = (PV >= 0.10) & (PV <= 0.90)
         m = zmask & pvmask & np.isfinite(SourcePV_raw)
@@ -796,11 +741,13 @@ def main():
             print(f"[DIAG] SourcePV sign check (interior): frac(SourcePV<0)={frac_neg:.2f}, median={med_src:.3e}")
             if frac_neg > 0.60:
                 print("[WARN] SourcePV mostly negative in interior; flipping PV and SourcePV sign.")
-                _apply_flip()
+                PV = 1.0 - PV
+                SourcePV_raw = -SourcePV_raw
+                flipped = True
         else:
             print("[WARN] SourcePV sign check: insufficient interior samples; skipping auto-flip.")
 
-    # Helpful diagnostic (doesn't decide flip)
+    # Optional: correlation diagnostic (does not decide flip)
     _diag_pvT_quantiles_byZ(
         Z=Z, PV=PV, T=T, PV_raw=PV_raw, Zgrid=Zgrid,
         q_lo=PV_Q_LO, q_hi=PV_Q_HI,
@@ -808,6 +755,22 @@ def main():
         pv_raw_span_min=1e-12,
         exclude_z_edge_rows=4
     )
+
+    # -----------------------------
+    # SourcePV diagnostics + winsorization (important for stability)
+    # -----------------------------
+    if have_sourcepv and (SourcePV_raw is not None):
+        sp = SourcePV_raw[np.isfinite(SourcePV_raw)]
+        if sp.size:
+            print(f"[DIAG] SourcePV raw: min={float(np.min(sp)):.6e}, max={float(np.max(sp)):.6e}, median={float(np.median(sp)):.6e}")
+
+        # winsorize heavy tail (you were using ~0.5/99.5)
+        lo = float(np.percentile(sp, 0.5)) if sp.size else 0.0
+        hi = float(np.percentile(sp, 99.5)) if sp.size else 0.0
+        if hi <= lo:
+            hi = lo + 1e-30
+        SourcePV_raw = np.clip(SourcePV_raw, lo, hi)
+        print(f"[DIAG] SourcePV winsorized to [{lo:.3e}, {hi:.3e}]")
 
     # -----------------------------
     # Build thermo tables
@@ -820,7 +783,7 @@ def main():
     )
     T_tbl = _nearest_fill(T_tbl_raw)
 
-    # keep boundary repair (prevents Z-edge nonsense)
+    # Boundary repair (prevents hot fill at Z~0 / Z~1)
     T_tbl = _enforce_Z_boundary_rows_from_data(
         Z=Z, PV=PV, T=T,
         Zgrid=Zgrid, PVgrid=PVgrid,
@@ -834,23 +797,8 @@ def main():
     rho_tbl_raw = _copy_sparse_rows_from_nearest_good(rho_tbl_raw, counts_rho, min_bins_nonempty=25)
     rho_tbl = _pad_extrapolate_const(_nearest_fill(rho_tbl_raw))
 
-    # -----------------------------
-    # SourcePV table (+ diagnostics)
-    # -----------------------------
+    # SourcePV table
     if have_sourcepv and (SourcePV_raw is not None):
-        sp = SourcePV_raw[np.isfinite(SourcePV_raw)]
-        if sp.size:
-            print(f"[DIAG] SourcePV raw: min={float(np.min(sp)):.6e}, max={float(np.max(sp)):.6e}, median={float(np.median(sp)):.6e}")
-
-        # Optional winsorization to avoid insane spikes dominating interpolation
-        WINSORIZE_SOURCEPV = bool(globals().get("WINSORIZE_SOURCEPV", True))
-        if WINSORIZE_SOURCEPV and sp.size:
-            lo = float(np.percentile(sp, 0.5))
-            hi = float(np.percentile(sp, 99.5))
-            if np.isfinite(lo) and np.isfinite(hi) and hi > lo:
-                SourcePV_raw = np.clip(SourcePV_raw, lo, hi)
-                print(f"[DIAG] SourcePV winsorized to [{lo:.3e}, {hi:.3e}]")
-
         spv_tbl_raw, counts_spv = _favre_bin_2d(Z, PV, rho, SourcePV_raw, Zgrid, PVgrid, MIN_BIN_COUNT)
         spv_tbl_raw = _copy_sparse_rows_from_nearest_good(spv_tbl_raw, counts_spv, min_bins_nonempty=25)
         spv_tbl = _pad_extrapolate_const(_nearest_fill(spv_tbl_raw))
@@ -867,7 +815,7 @@ def main():
         print("[WARN] Writing thermo/SourcePV.csv as ZEROS.")
 
     # -----------------------------
-    # Species tables
+    # species tables
     # -----------------------------
     species_tables = {}
     for yc in species_cols:
@@ -916,8 +864,9 @@ def main():
             "pv_raw_min": float(pv_lo),
             "pv_raw_hi_percentile": float(pv_hi),
             "pv_axis_flipped": bool(flipped),
-            "pv_norm_method": "global" if USE_GLOBAL_PV else "perZ_smoothed",
+            "pv_norm": "global",
             "sourcepv_col": sourcepv_col if have_sourcepv else None,
+            "sourcepv_winsor": {"lo_pct": 0.5, "hi_pct": 99.5} if have_sourcepv else None,
         },
         "source": files,
     }
@@ -943,7 +892,7 @@ def main():
 
     print(f"Wrote {OUT_TAR}")
     print(f"  axes:     NZ={len(Zgrid)}  NPV={len(PVgrid)}  (padded eps={PAD_EPS:g})")
-    print(f"  PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}  |  norm={'global' if USE_GLOBAL_PV else 'perZ'}")
+    print(f"  PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}  |  norm=global")
     print(f"  SourcePV: {'from ' + sourcepv_col if (have_sourcepv and SourcePV_raw is not None) else 'ZEROS'}"
           f"{' (sign flipped)' if flipped else ''}")
     print(f"  species:  {len(species_tables)} tables")
