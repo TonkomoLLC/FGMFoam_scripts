@@ -25,13 +25,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # ---------------- user knobs ----------------
 POST_GLOB = "post_strain_loop_*.csv"
 
 # Final table resolution (including padding cells). Typical: 101x101
-NZ = 101
-NPV = 101
+NZ = 41
+NPV = 41
 
 # Minimum points per bin to accept (else NaN -> filled)
 MIN_BIN_COUNT = 6
@@ -693,7 +694,7 @@ def main():
     print(f"[DIAG] Z axis range: data [{Z_lo:.6g}, {Z_hi:.6g}]  |  axis [{Zgrid[0]:.6g}, {Zgrid[-1]:.6g}]")
 
     # -----------------------------
-    # GLOBAL PV normalization (this is what gave you the “so close” result)
+    # GLOBAL PV normalization
     # -----------------------------
     pv_finite = PV_raw[np.isfinite(PV_raw)]
     if pv_finite.size == 0:
@@ -709,10 +710,6 @@ def main():
     PV = np.where(np.isfinite(PV), PV, 0.0)
     PV = np.clip(PV, 0.0, 1.0)
 
-    # PVmin/PVmax vectors are in *physical PV units* for metadata/reconstruction
-    PVmin_vec = np.full(len(Zgrid), pv_lo, dtype=float)
-    PVmax_vec = np.full(len(Zgrid), pv_hi, dtype=float)
-
     print(f"[DIAG] PV raw:   min={pv_lo:.6e}, hi(p{PV_HI_PERCENTILE:g})={pv_hi:.6e}")
     print(f"[DIAG] PV span (global) = {pv_span:.6e}")
 
@@ -720,9 +717,9 @@ def main():
     # PV orientation handling
     # -----------------------------
     flipped = False
-    FORCE_PV_FLIP = bool(globals().get("FORCE_PV_FLIP", False))
-    DISABLE_AUTO_FLIP = bool(globals().get("DISABLE_AUTO_FLIP", False))
+    flipped_q = False  # always define
 
+    # Optional manual flip first
     if FORCE_PV_FLIP:
         print("[WARN] FORCE_PV_FLIP=True: flipping PV and SourcePV sign.")
         PV = 1.0 - PV
@@ -730,24 +727,7 @@ def main():
         if have_sourcepv and (SourcePV_raw is not None):
             SourcePV_raw = -SourcePV_raw
 
-    elif (have_sourcepv and (SourcePV_raw is not None) and not DISABLE_AUTO_FLIP):
-        # Only flip if SourcePV is *overwhelmingly* negative in the interior.
-        zmask = (Z >= Zgrid[2]) & (Z <= Zgrid[-3])
-        pvmask = (PV >= 0.10) & (PV <= 0.90)
-        m = zmask & pvmask & np.isfinite(SourcePV_raw)
-        if np.count_nonzero(m) > 500:
-            frac_neg = float(np.mean(SourcePV_raw[m] < 0.0))
-            med_src = float(np.median(SourcePV_raw[m]))
-            print(f"[DIAG] SourcePV sign check (interior): frac(SourcePV<0)={frac_neg:.2f}, median={med_src:.3e}")
-            if frac_neg > 0.60:
-                print("[WARN] SourcePV mostly negative in interior; flipping PV and SourcePV sign.")
-                PV = 1.0 - PV
-                SourcePV_raw = -SourcePV_raw
-                flipped = True
-        else:
-            print("[WARN] SourcePV sign check: insufficient interior samples; skipping auto-flip.")
-
-    # Optional: correlation diagnostic (does not decide flip)
+    # Pre-flip diagnostic
     _diag_pvT_quantiles_byZ(
         Z=Z, PV=PV, T=T, PV_raw=PV_raw, Zgrid=Zgrid,
         q_lo=PV_Q_LO, q_hi=PV_Q_HI,
@@ -755,6 +735,43 @@ def main():
         pv_raw_span_min=1e-12,
         exclude_z_edge_rows=4
     )
+
+    # Robust auto-flip (only if not forced and not disabled)
+    if (not FORCE_PV_FLIP) and (not DISABLE_AUTO_FLIP):
+        PV, SourcePV_raw, flipped_q, dT_rows, frac_neg = _robust_pv_autoflip_quantile(
+            Z=Z, PV=PV, T=T, PV_raw=PV_raw, Zgrid=Zgrid,
+            have_sourcepv=have_sourcepv,
+            SourcePV=SourcePV_raw,
+            min_rows=10,
+            min_samples_row=60,
+            q_lo=PV_Q_LO,
+            q_hi=PV_Q_HI,
+            flip_if_frac_negative_gt=0.55,
+            exclude_z_edge_rows=4
+        )
+        flipped = flipped or flipped_q
+
+    # Post-flip diagnostic (only if a flip happened)
+    if flipped:
+        _diag_pvT_quantiles_byZ(
+            Z=Z, PV=PV, T=T, PV_raw=PV_raw, Zgrid=Zgrid,
+            q_lo=PV_Q_LO, q_hi=PV_Q_HI,
+            min_samples_row=60,
+            pv_raw_span_min=1e-12,
+            exclude_z_edge_rows=4
+        )
+
+    # -----------------------------
+    # PVmin/PVmax vectors for reconstruction (MUST match PV axis endpoints)
+    #   PV_raw = PVmin + PV*(PVmax - PVmin)
+    # If PV was flipped, PV=0 corresponds to pv_hi and PV=1 corresponds to pv_lo.
+    # -----------------------------
+    if flipped:
+        PVmin_vec = np.full(len(Zgrid), pv_hi, dtype=float)  # PV=0 endpoint in raw units
+        PVmax_vec = np.full(len(Zgrid), pv_lo, dtype=float)  # PV=1 endpoint in raw units
+    else:
+        PVmin_vec = np.full(len(Zgrid), pv_lo, dtype=float)  # PV=0 endpoint in raw units
+        PVmax_vec = np.full(len(Zgrid), pv_hi, dtype=float)  # PV=1 endpoint in raw units
 
     # -----------------------------
     # SourcePV diagnostics + winsorization (important for stability)
@@ -782,6 +799,48 @@ def main():
         min_count_per_bin=MIN_BIN_COUNT
     )
     T_tbl = _nearest_fill(T_tbl_raw)
+
+    # -----------------------------
+    # DIAG: bin occupancy / sparsity
+    # -----------------------------
+    # Interior = exclude padded rows/cols
+    c = counts_T[1:-1, 1:-1]
+
+    total_bins = c.size
+    nonempty_bins = int(np.count_nonzero(c > 0))
+    good_bins = int(np.count_nonzero(c >= MIN_BIN_COUNT))
+    sparse_bins = int(np.count_nonzero((c > 0) & (c < MIN_BIN_COUNT)))
+    empty_bins = int(np.count_nonzero(c == 0))
+
+    frac_good = good_bins / total_bins
+    frac_sparse = sparse_bins / total_bins
+    frac_empty = empty_bins / total_bins
+
+    print("[DIAG] counts_T (interior): "
+          f"min={int(c.min())}, p10={int(np.percentile(c,10))}, "
+          f"median={int(np.median(c))}, p90={int(np.percentile(c,90))}, "
+          f"max={int(c.max())}")
+    print("[DIAG] counts_T (interior): "
+          f"good(>=MIN_BIN_COUNT)={good_bins}/{total_bins} ({100*frac_good:.1f}%), "
+          f"sparse(1..MIN-1)={sparse_bins}/{total_bins} ({100*frac_sparse:.1f}%), "
+          f"empty(0)={empty_bins}/{total_bins} ({100*frac_empty:.1f}%)")
+
+
+    # -----------------------------
+    # DIAG: plot bin occupancy map
+    # -----------------------------
+    c = counts_T[1:-1, 1:-1]  # interior only
+
+    plt.figure()
+    plt.title("FGM bin occupancy: counts_T (interior)")
+    plt.xlabel("PV bin")
+    plt.ylabel("Z bin")
+    plt.imshow(np.log10(c + 1), origin="lower", aspect="auto")
+    plt.colorbar(label="log10(count + 1)")
+    plt.tight_layout()
+    plt.savefig("counts_T.png", dpi=200)
+    print("[DIAG] Wrote counts_T.png")
+
 
     # Boundary repair (prevents hot fill at Z~0 / Z~1)
     T_tbl = _enforce_Z_boundary_rows_from_data(
