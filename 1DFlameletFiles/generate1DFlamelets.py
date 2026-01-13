@@ -82,9 +82,14 @@ def set_profile_T(f, xi, prof):
         )
         f.set_profile("T", xi, prof)
 
-def save_yaml_csv(f, path_yaml):
+def save_yaml_csv(f, path_yaml, resamp_npts=800):
     f.save(path_yaml, name='diff1D', overwrite=True)
-    f.save(path_yaml.replace('.yaml', '.csv'), name='diff1D', overwrite=True)
+    path_csv = path_yaml.replace('.yaml', '.csv')
+    f.save(path_csv, name='diff1D', overwrite=True)
+
+    # extra uniformly sampled CSV for robust downstream tabulation
+    path_resamp = path_yaml.replace('.yaml', '_resamp.csv')
+    save_resampled_csv(f, path_resamp, npts=resamp_npts)
 
 def xi_peak(f):
     z = f.grid
@@ -209,6 +214,37 @@ def ignite_base_flame(f):
                 f.solve(loglevel=loglevel, auto=False)
             return True
     return False
+
+def save_resampled_csv(f, path_csv, npts=800):
+    """
+    Save a uniformly-resampled profile to CSV.
+    This does NOT change Cantera's own saved CSV; it creates an additional file.
+    Columns: x, T, rho, and Y.<species> for all species in the mechanism.
+    """
+    x = f.grid.astype(float)
+    x_u = np.linspace(x[0], x[-1], int(npts))
+
+    # helper: 1D interpolate profile values from flame grid to uniform grid
+    def interp(v):
+        v = np.asarray(v, dtype=float)
+        return np.interp(x_u, x, v)
+
+    data = {
+        "x": x_u,
+        "x_norm": (x_u - x_u[0]) / (x_u[-1] - x_u[0] + 1e-30),
+        "T": interp(f.T),
+        "rho": interp(f.density),
+    }
+
+    # species mass fractions
+    # f.Y has shape (n_species, n_grid)
+    for k, name in enumerate(f.gas.species_names):
+        data[f"Y.{name}"] = np.clip(interp(f.Y[k, :]), 0.0, 1.0)
+
+    import pandas as pd
+    pd.DataFrame(data).to_csv(path_csv, index=False)
+
+
 # ------------------------------------------------
 
 
