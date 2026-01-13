@@ -1,3 +1,7 @@
+# Warning this is not yet fully working!
+
+But if you want to build FGM tables, maybe this work will inspire you.
+
 # Compiling the solver
 
 1. Install OpenFOAM v7

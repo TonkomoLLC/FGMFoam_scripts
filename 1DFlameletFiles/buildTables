@@ -12,7 +12,11 @@ python3 csv2of_tables.py \
   --varZ 0 0.25 0.5 0.75 1 \
   --varPV 0 0.1 0.2 0.5 1
   
-python3 plot_thermo_table.py --tables 02_tables.tar.xz --out thermo_T.png
+# Temperature, interior only, do not show
+./plot_thermo_table.py 02_tables.tar.xz --no-show
+
+# SourcePV (often useful), with log scaling
+./plot_thermo_table.py 02_tables.tar.xz --field SourcePV --log
 
 
 
