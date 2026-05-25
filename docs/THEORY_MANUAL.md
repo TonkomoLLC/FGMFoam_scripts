@@ -2,13 +2,14 @@
 
 ## Zero-variance progress-variable-variance execution path
 
-**Document status:** validated implementation note for `FGMScripts_OF7_premixed_v6_zeroVarPV`  
+**Document status:** validated implementation note for `FGMScripts_OF7_premixed`  
 **Solver target:** OpenFOAM 7 `FGMFoam`  
 **Combustion formulation:** premixed CH₄/air flamelet-generated manifold (FGM)  
 **Current validated mode:** `useProgressVariableVariance true` with `varPV = 0` and `varZ = 0`
 
-> **GitHub rendering note:** This document uses GitHub-supported LaTeX math delimiters:
-> `$...$` for inline mathematics and `$$...$$` for display equations.
+> **GitHub rendering note:** This document uses `$...$` for inline mathematics and GitHub fenced `math` blocks for display equations. The fenced form is used for reliable rendering of multiline equations in repository previews and PDF exports.
+
+> **Rendering revision:** Display equations were converted to fenced `math` blocks, and the two normalized-variance clipping expressions were rewritten using a GitHub-supported roman function label.
 
 ---
 
@@ -35,13 +36,12 @@ The correct classification is:
 
 For the main FGM quantities, `FGMModel` constructs a four-entry lookup vector:
 
-$$
+```math
 \mathbf{x} =
 \left[
 \eta_{PV},\; c,\; \zeta_Z,\; Z
 \right]
-$$
-
+```
 where:
 
 | Coordinate | Meaning | Current database status |
@@ -62,19 +62,17 @@ PV-bound tables:     (Zeta, Z)                 = (5, 51)
 
 The generated fields vary with:
 
-$$
+```math
 \Phi = \Phi(Z,c)
-$$
-
+```
 They do not yet contain a physically integrated dependence on either variance coordinate:
 
-$$
+```math
 \Phi(Z,c,\zeta_Z,\eta_{PV})
 =
 \Phi(Z,c,0,0)
 \quad \text{for all stored } \zeta_Z,\eta_{PV}
-$$
-
+```
 The five variance slices exist to satisfy the older interpolation implementation and to permit the developer's `useProgressVariableVariance true` code path to execute in the zero-variance limit.
 
 ### 2.3 Classification table
@@ -107,22 +105,19 @@ for a set of unburned CH₄/air mixture coordinates $Z$.
 
 In the table-generation workflow, $Z$ is defined as the fuel-stream mass fraction in the unburned fuel/oxidizer mixture. For the present pure-methane fuel stream, this is equivalent to the unburned methane mass fraction:
 
-$$
+```math
 Z = Y_{\mathrm{CH_4},u}
-$$
-
+```
 The case-specific default axis is:
 
-$$
+```math
 0 \le Z \le 0.1559
-$$
-
+```
 and includes the pilot mixture coordinate:
 
-$$
+```math
 Z_{\mathrm{pilot}} = 0.04293
-$$
-
+```
 These bounds are important: a table axis ranging from 0 to 1 would not reproduce the coordinate system used by this case.
 
 ---
@@ -133,7 +128,7 @@ These bounds are important: a table axis ranging from 0 to 1 would not reproduce
 
 The patched table generator defines the unscaled progress variable in molar-per-mass units as:
 
-$$
+```math
 PV =
 4\frac{Y_{\mathrm{H_2O}}}{W_{\mathrm{H_2O}}}
 +
@@ -142,8 +137,7 @@ PV =
 0.5\frac{Y_{\mathrm{H_2}}}{W_{\mathrm{H_2}}}
 +
 \frac{Y_{\mathrm{CO}}}{W_{\mathrm{CO}}}
-$$
-
+```
 where $Y_i$ is mass fraction and $W_i$ is molecular weight. In the Python implementation, the resulting convention is documented as kmol/kg.
 
 The included species and weights are:
@@ -161,7 +155,7 @@ PV_WEIGHTS = {
 
 The volumetric source of the raw progress variable is calculated from Cantera net production rates:
 
-$$
+```math
 \dot{\omega}_{PV} =
 4\dot{\omega}_{\mathrm{H_2O}}
 +
@@ -170,40 +164,35 @@ $$
 0.5\dot{\omega}_{\mathrm{H_2}}
 +
 \dot{\omega}_{\mathrm{CO}}
-$$
-
+```
 The `SourcePV_table` stores:
 
-$$
+```math
 W = \dot{\omega}_{PV}
-$$
-
+```
 in the table generator's volumetric source convention.
 
 ### 4.3 Scaled progress variable
 
 The solver transports unscaled `PV`, while table lookup uses a bounded scaled progress variable:
 
-$$
+```math
 c =
 \frac{PV - PV_{\min}(Z,\zeta_Z)}
      {PV_{\max}(Z,\zeta_Z)-PV_{\min}(Z,\zeta_Z)}
-$$
-
+```
 followed by clipping:
 
-$$
+```math
 0 \le c \le 1
-$$
-
+```
 For the zero-variance table database:
 
-$$
+```math
 PV_{\min}(Z,\zeta_Z)=PV_{\min}(Z,0),
 \qquad
 PV_{\max}(Z,\zeta_Z)=PV_{\max}(Z,0)
-$$
-
+```
 because the stored $\zeta_Z$ slices are replicated.
 
 ---
@@ -214,22 +203,20 @@ because the stored $\zeta_Z$ slices are replicated.
 
 The solver computes the normalized mixture-fraction-variance coordinate as:
 
-$$
+```math
 \zeta_Z =
-\operatorname{clip}
+\mathrm{clip}
 \left(
 \frac{\widetilde{Z''^2}}
      {\max\left(\widetilde{Z}(1-\widetilde{Z}),\epsilon_s\right)},
 0,\;0.99
 \right)
-$$
-
+```
 where the OpenFOAM field is `varZ` and the solver uses:
 
-$$
+```math
 \epsilon_s = 10^{-5}
-$$
-
+```
 in the supplied `FGMModel.C`.
 
 The current validated case maintains:
@@ -243,10 +230,9 @@ varZ
 
 Thus:
 
-$$
+```math
 \zeta_Z=0
-$$
-
+```
 through the validated lookup path.
 
 ### 5.2 Progress-variable variance
@@ -261,30 +247,26 @@ the solver loads additional PV moment tables and calculates the variance of the 
 
 Define:
 
-$$
+```math
 Y_u = PV_{\min}, \qquad Y_b = PV_{\max}
-$$
-
+```
 and moment quantities:
 
-$$
+```math
 f_c = \langle Y_u^2\rangle
-$$
-
-$$
+```
+```math
 g_c = \langle Y_uY_b\rangle-\langle Y_u^2\rangle
-$$
-
-$$
+```
+```math
 h_c =
 \langle Y_b^2\rangle
 -2\langle Y_uY_b\rangle
 +\langle Y_u^2\rangle
-$$
-
+```
 The solver calculates:
 
-$$
+```math
 \widetilde{c''^2}
 =
 \frac{
@@ -299,20 +281,18 @@ f_c
 {\max(h_c,\epsilon_s)}
 -
 \widetilde{c}^2
-$$
-
+```
 and then:
 
-$$
+```math
 \eta_{PV} =
-\operatorname{clip}
+\mathrm{clip}
 \left(
 \frac{\widetilde{c''^2}}
      {\max\left(\widetilde{c}(1-\widetilde{c}),\epsilon_s\right)},
 0,\;0.99
 \right)
-$$
-
+```
 For the currently validated case:
 
 ```foam
@@ -324,12 +304,11 @@ varPV
 
 and the auxiliary table identities below enforce:
 
-$$
+```math
 \widetilde{c''^2}=0,
 \qquad
 \eta_{PV}=0
-$$
-
+```
 up to numerical table precision.
 
 ---
@@ -354,54 +333,44 @@ YuYbI_table
 Yb2I_table
 ```
 
-### 6.2 Zero-variance identities implemented in v6
+### 6.2 Zero-variance identities implemented in latest version
 
 For the current replicated zero-variance database:
 
-$$
+```math
 Y_u = PV_{\min}
-$$
-
-$$
+```
+```math
 Y_b = PV_{\max}
-$$
-
-$$
+```
+```math
 PV = Y_u + c(Y_b-Y_u)
-$$
-
-$$
+```
+```math
 W = \dot{\omega}_{PV}
-$$
-
+```
 The auxiliary source quantities are:
 
-$$
+```math
 YWI = PV\,W
-$$
-
-$$
+```
+```math
 YuWI = Y_u\,W
-$$
-
-$$
+```
+```math
 YbWI = Y_b\,W
-$$
-
+```
 The auxiliary moment quantities are:
 
-$$
+```math
 Yu2I = Y_u^2
-$$
-
-$$
+```
+```math
 YuYbI = Y_uY_b
-$$
-
-$$
+```
+```math
 Yb2I = Y_b^2
-$$
-
+```
 These relations reproduce the algebraic zero-variance limit of the progress-variable-variance scaling implemented in `FGMModel.C`.
 
 ### 6.3 Meaning of the present implementation
@@ -459,10 +428,9 @@ Their storage order is:
 
 or conceptually:
 
-$$
+```math
 (\eta_{PV}, c, \zeta_Z, Z)
-$$
-
+```
 ### 7.2 Two-index PV-family tables
 
 The following are stored on:
@@ -473,10 +441,9 @@ The following are stored on:
 
 or conceptually:
 
-$$
+```math
 (\zeta_Z,Z)
-$$
-
+```
 Tables:
 
 ```text
@@ -557,28 +524,25 @@ The raw premixed flame coordinate is then remapped to the scaled progress coordi
 
 The table builder constructs a uniform target table over:
 
-$$
+```math
 Z_i, \quad i=1,\ldots,51
-$$
-
+```
 and:
 
-$$
+```math
 c_j, \quad j=1,\ldots,51
-$$
-
+```
 using premixed flamelet data and endpoint extensions where a flamelet solution is not physically available.
 
 ### 8.4 Replication over variance axes
 
 For the present version:
 
-$$
+```math
 \Phi(\eta_{PV,k},c_j,\zeta_{Z,l},Z_i)
 =
 \Phi(0,c_j,0,Z_i)
-$$
-
+```
 for every stored variance index $k,l$. This is a deliberate compatibility and zero-variance-execution strategy, not presumed-PDF integration.
 
 ---
@@ -599,7 +563,7 @@ OH result:
 
 ### 9.2 Algebraic validation of the zero-variance PVeta path
 
-The v6 validator checks:
+The current validator checks:
 
 1. presence of all tables required by `useProgressVariableVariance true`;
 2. correct OpenFOAM table topology;
@@ -611,10 +575,9 @@ The v6 validator checks:
 
 The resulting execution path is therefore validated for:
 
-$$
+```math
 \eta_{PV}=0,\qquad \zeta_Z=0
-$$
-
+```
 not for nonzero variances.
 
 ---
@@ -625,10 +588,9 @@ not for nonzero variances.
 
 A true 3D table would resolve one nonzero variance coordinate in addition to $Z$ and $c$, for example:
 
-$$
+```math
 \Phi = \Phi(Z,c,\zeta_Z)
-$$
-
+```
 This requires:
 
 1. a physically meaningful `varZ` model in CFD;
@@ -641,10 +603,9 @@ Alternatively, a progress-variable-only three-dimensional table would resolve $\
 
 A true four-dimensional presumed-PDF database requires:
 
-$$
+```math
 \Phi = \Phi(Z,c,\zeta_Z,\eta_{PV})
-$$
-
+```
 with:
 
 1. nonzero `varZ` and `varPV` transport or closure models;
@@ -682,7 +643,7 @@ Avoid describing it as a “true 4D FGM table” until the variance-axis slices 
 
 ## 12. Relevant implementation files
 
-Within `FGMScripts_OF7_premixed_v6_zeroVarPV`:
+Within `FGMScripts_OF7_premixed`:
 
 | File | Role |
 |---|---|
