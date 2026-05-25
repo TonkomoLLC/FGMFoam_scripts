@@ -1,0 +1,131 @@
+Courant Number mean: 0.0086842619 max: 0.63709143
+Time = 0.0998
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 0.0052305286, Final residual = 7.6800198e-07, No Iterations 2
+DILUPBiCG:  Solving for Uy, Initial residual = 0.0020709736, Final residual = 2.1953796e-07, No Iterations 2
+DILUPBiCG:  Solving for Uz, Initial residual = 0.001039388, Final residual = 3.0075405e-07, No Iterations 2
+DILUPBiCG:  Solving for Z, Initial residual = 1.9759888e-05, Final residual = 5.9291214e-09, No Iterations 2
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 3.9573555e-05, Final residual = 3.1353544e-07, No Iterations 1
+PV min/max = 0/0.036543908
+Entering FGMModel correct()
+T gas min/max = 294/2167.0137
+GAMGPCG:  Solving for p, Initial residual = 0.14934344, Final residual = 0.0039333172, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.0036332995, Final residual = 0.00010513376, No Iterations 3
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 1.0503473e-07, global = -5.5651987e-08, cumulative = 1.1495442e-05
+GAMGPCG:  Solving for p, Initial residual = 0.0035410276, Final residual = 7.0645979e-05, No Iterations 2
+GAMGPCG:  Solving for p, Initial residual = 7.0933014e-05, Final residual = 7.3501986e-07, No Iterations 5
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 7.2918267e-10, global = 2.2460078e-10, cumulative = 1.1495666e-05
+DILUPBiCG:  Solving for epsilon, Initial residual = 4.0819558e-05, Final residual = 6.9022419e-07, No Iterations 1
+DILUPBiCG:  Solving for k, Initial residual = 4.5707529e-05, Final residual = 4.5730269e-07, No Iterations 1
+ExecutionTime = 43.43 s  ClockTime = 44 s
+
+Courant Number mean: 0.008712133 max: 0.64614625
+Time = 0.09985
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 0.005341765, Final residual = 9.9946871e-07, No Iterations 2
+DILUPBiCG:  Solving for Uy, Initial residual = 0.0020825429, Final residual = 7.5731004e-08, No Iterations 3
+DILUPBiCG:  Solving for Uz, Initial residual = 0.0011921835, Final residual = 2.1165079e-07, No Iterations 2
+DILUPBiCG:  Solving for Z, Initial residual = 2.0418526e-05, Final residual = 1.8276352e-07, No Iterations 1
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 4.1203497e-05, Final residual = 3.1705199e-07, No Iterations 1
+PV min/max = 0/0.035988148
+Entering FGMModel correct()
+T gas min/max = 294/2199.6616
+GAMGPCG:  Solving for p, Initial residual = 0.12923498, Final residual = 0.0035696192, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.003338829, Final residual = 7.5431162e-05, No Iterations 3
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 8.4744686e-08, global = -5.2345163e-08, cumulative = 1.1443321e-05
+GAMGPCG:  Solving for p, Initial residual = 0.0034223203, Final residual = 6.7482614e-05, No Iterations 2
+GAMGPCG:  Solving for p, Initial residual = 6.7608348e-05, Final residual = 6.520915e-07, No Iterations 5
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 7.2785707e-10, global = -2.0668042e-10, cumulative = 1.1443114e-05
+DILUPBiCG:  Solving for epsilon, Initial residual = 4.3077593e-05, Final residual = 7.522055e-07, No Iterations 1
+DILUPBiCG:  Solving for k, Initial residual = 4.4890512e-05, Final residual = 5.9833402e-07, No Iterations 1
+ExecutionTime = 43.45 s  ClockTime = 44 s
+
+Courant Number mean: 0.0087015393 max: 0.63605026
+Time = 0.0999
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 0.0061831891, Final residual = 3.7370489e-08, No Iterations 3
+DILUPBiCG:  Solving for Uy, Initial residual = 0.002085389, Final residual = 2.0315797e-07, No Iterations 2
+DILUPBiCG:  Solving for Uz, Initial residual = 0.0013402477, Final residual = 2.3773623e-07, No Iterations 2
+DILUPBiCG:  Solving for Z, Initial residual = 1.9967626e-05, Final residual = 3.9085266e-07, No Iterations 1
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 4.0700587e-05, Final residual = 3.0248398e-07, No Iterations 1
+PV min/max = 0/0.036857789
+Entering FGMModel correct()
+T gas min/max = 294/2166.8111
+GAMGPCG:  Solving for p, Initial residual = 0.11362921, Final residual = 0.0032732752, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.0030766395, Final residual = 0.00010491785, No Iterations 2
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 1.3094341e-07, global = 4.4301787e-09, cumulative = 1.1447544e-05
+GAMGPCG:  Solving for p, Initial residual = 0.0031447411, Final residual = 5.8899865e-05, No Iterations 2
+GAMGPCG:  Solving for p, Initial residual = 5.9094928e-05, Final residual = 5.7583672e-07, No Iterations 4
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 7.1435241e-10, global = 7.4486006e-11, cumulative = 1.1447619e-05
+DILUPBiCG:  Solving for epsilon, Initial residual = 4.3975246e-05, Final residual = 7.4475133e-07, No Iterations 1
+DILUPBiCG:  Solving for k, Initial residual = 4.6565411e-05, Final residual = 5.5465212e-07, No Iterations 1
+ExecutionTime = 43.47 s  ClockTime = 44 s
+
+Courant Number mean: 0.008740909 max: 0.64674318
+Time = 0.09995
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 0.0062837669, Final residual = 9.6983429e-07, No Iterations 2
+DILUPBiCG:  Solving for Uy, Initial residual = 0.0020688435, Final residual = 3.8193448e-07, No Iterations 2
+DILUPBiCG:  Solving for Uz, Initial residual = 0.0014848389, Final residual = 2.5119789e-07, No Iterations 2
+DILUPBiCG:  Solving for Z, Initial residual = 2.0674262e-05, Final residual = 2.6688161e-07, No Iterations 1
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 4.1400433e-05, Final residual = 3.7882017e-07, No Iterations 1
+PV min/max = 0/0.036848006
+Entering FGMModel correct()
+T gas min/max = 294/2166.7176
+GAMGPCG:  Solving for p, Initial residual = 0.10025796, Final residual = 0.003231538, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.0030731057, Final residual = 5.03147e-05, No Iterations 3
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 6.8514481e-08, global = -2.7253206e-08, cumulative = 1.1420366e-05
+GAMGPCG:  Solving for p, Initial residual = 0.0029056683, Final residual = 5.8823296e-05, No Iterations 2
+GAMGPCG:  Solving for p, Initial residual = 5.8909975e-05, Final residual = 5.9976618e-07, No Iterations 4
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 8.1245714e-10, global = -3.9387515e-11, cumulative = 1.1420326e-05
+DILUPBiCG:  Solving for epsilon, Initial residual = 3.8868414e-05, Final residual = 6.3850796e-07, No Iterations 1
+DILUPBiCG:  Solving for k, Initial residual = 4.3996692e-05, Final residual = 2.1330295e-07, No Iterations 2
+ExecutionTime = 43.5 s  ClockTime = 44 s
+
+Courant Number mean: 0.0087426437 max: 0.63857754
+Time = 0.1
+
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+DILUPBiCG:  Solving for Ux, Initial residual = 0.0069573793, Final residual = 9.8154806e-07, No Iterations 2
+DILUPBiCG:  Solving for Uy, Initial residual = 0.0019874892, Final residual = 1.2646927e-07, No Iterations 2
+DILUPBiCG:  Solving for Uz, Initial residual = 0.0016190372, Final residual = 2.5781448e-07, No Iterations 2
+DILUPBiCG:  Solving for Z, Initial residual = 2.0361064e-05, Final residual = 6.8523181e-07, No Iterations 1
+Entering FGMModel correct()
+Z min/max = 0/0.1559
+DILUPBiCG:  Solving for PV, Initial residual = 4.189017e-05, Final residual = 2.5736427e-07, No Iterations 1
+PV min/max = 0/0.036527872
+Entering FGMModel correct()
+T gas min/max = 294/2199.8247
+GAMGPCG:  Solving for p, Initial residual = 0.088577304, Final residual = 0.0031908476, No Iterations 1
+GAMGPCG:  Solving for p, Initial residual = 0.0030390937, Final residual = 8.149694e-05, No Iterations 3
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 1.2044436e-07, global = -6.1418158e-08, cumulative = 1.1358908e-05
+GAMGPCG:  Solving for p, Initial residual = 0.0027734589, Final residual = 5.6979875e-05, No Iterations 2
+GAMGPCG:  Solving for p, Initial residual = 5.7151678e-05, Final residual = 5.4829308e-07, No Iterations 5
+diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
+time step continuity errors : sum local = 8.0555068e-10, global = 2.8649125e-10, cumulative = 1.1359195e-05
+DILUPBiCG:  Solving for epsilon, Initial residual = 4.3718795e-05, Final residual = 8.4515525e-07, No Iterations 1
+DILUPBiCG:  Solving for k, Initial residual = 4.7158766e-05, Final residual = 6.1982972e-07, No Iterations 1
+ExecutionTime = 43.53 s  ClockTime = 44 s
+
+End
