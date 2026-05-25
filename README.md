@@ -40,13 +40,10 @@ Technically, 4D in OpenFOAM storage and lookup interface, but still 2D in physic
 
 ```
 ./make_03_testcase_premixed_tables_from_scratch.sh
-./upgrade_current_working_tables_to_zeroVarPV_true.sh
 cd 03_testcase
 FGMFoam
 FGMFoamPost -latestTime
 ```
-
-
 
 ![Sandia D temperature](./docs/images/validated_temperature_field.png)
 
