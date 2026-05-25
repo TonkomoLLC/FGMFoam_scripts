@@ -38,6 +38,15 @@ FGMFoamPost -latestTime
 
 Technically, 4D in OpenFOAM storage and lookup interface, but still 2D in physical manifold content: it resolves Z and scaled progress variable c, while the Z-variance and progress-variable-variance axes are replicated zero-variance slices.
 
+```
+./make_03_testcase_premixed_tables_from_scratch.sh
+./upgrade_current_working_tables_to_zeroVarPV_true.sh
+cd 03_testcase
+FGMFoam
+FGMFoamPost -latestTime
+```
+
+
 
 ![Sandia D temperature](./temp.png)
 
