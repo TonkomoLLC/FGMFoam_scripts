@@ -48,10 +48,10 @@ FGMFoamPost -latestTime
 
 
 
-![Sandia D temperature](./temp.png)
+![Sandia D temperature](./docs/images/validated_temperature_field.png)
 
 
-![Sandia D OH mass fraction](./OH.png)
+![Sandia D OH mass fraction](./docs/images/validated_OH_field.png)
 
 
 # Docs

@@ -1,6 +1,6 @@
 # User Manual: Generate and Run Premixed FGM Tables with OpenFOAM 7 `FGMFoam`
 
-## `FGMTableBuild_OF7_premixed`
+## `FGMScripts_OF7_premixed_v6_zeroVarPV`
 
 **Target solver:** OpenFOAM 7 `FGMFoam`  
 **Validated case:** `03_testcase`  
@@ -72,7 +72,7 @@ The commands in this manual assume the following working layout:
 ```text
 /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/
 ├── 03_testcase/
-├── FGMTableBuild_OF7_premixed/
+├── FGMScripts_OF7_premixed_v6_zeroVarPV/
 ├── gri30.yaml
 └── optional generated directories
 ```
@@ -86,8 +86,8 @@ cd /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow
 Unpack the package:
 
 ```bash
-unzip /path/to/FGMTableBuild_OF7_premixed.zip
-chmod +x FGMTableBuild_OF7_premixed/*.sh
+unzip /path/to/FGMScripts_OF7_premixed_v6_zeroVarPV.zip
+chmod +x FGMScripts_OF7_premixed_v6_zeroVarPV/*.sh
 ```
 
 ---
@@ -115,7 +115,7 @@ This is the recommended immediate path because it leaves the successfully igniti
 Run from the directory containing `03_testcase`:
 
 ```bash
-./FGMTableBuild_OF7_premixed/upgrade_current_working_tables_to_zeroVarPV_true.sh
+./FGMScripts_OF7_premixed_v6_zeroVarPV/upgrade_current_working_tables_to_zeroVarPV_true.sh
 ```
 
 ### Actions performed
@@ -177,7 +177,7 @@ Those correspond to the discarded counterflow diffusion-flame approach.
 ## 7. Run table processing and installation
 
 ```bash
-./FGMTableBuild_OF7_premixed/make_03_testcase_tables_from_existing_premixed_flamelets.sh
+./FGMScripts_OF7_premixed_v6_zeroVarPV/make_03_testcase_tables_from_existing_premixed_flamelets.sh
 ```
 
 The workflow performs:
@@ -206,7 +206,7 @@ premixed YAML flamelets
 
 ```bash
 MECH=myMechanism.yaml NZ=101 NC=101 TIN=300.0 \
-./FGMTableBuild_OF7_premixed/make_03_testcase_tables_from_existing_premixed_flamelets.sh
+./FGMScripts_OF7_premixed_v6_zeroVarPV/make_03_testcase_tables_from_existing_premixed_flamelets.sh
 ```
 
 Only change these values when the case boundary conditions and intended FGM coordinate system are correspondingly updated.
@@ -220,7 +220,7 @@ Only change these values when the case boundary conditions and intended FGM coor
 Run:
 
 ```bash
-./FGMTableBuild_OF7_premixed/make_03_testcase_premixed_tables_from_scratch.sh
+./FGMScripts_OF7_premixed_v6_zeroVarPV/make_03_testcase_premixed_tables_from_scratch.sh
 ```
 
 This generates new flamelets in:
@@ -470,7 +470,7 @@ OH:
 The table validator may be run directly:
 
 ```bash
-python3 FGMTableBuild_OF7_premixed/scripts/validate_of7_premixed_tables.py \
+python3 FGMScripts_OF7_premixed_v6_zeroVarPV/scripts/validate_of7_premixed_tables.py \
   --case "$PWD/03_testcase" \
   --require-species CH4 O2 CO2 H2O OH N2 \
   --check-z 0.04293 0.1559 \
@@ -584,7 +584,7 @@ FGMFoam_OF7_premixed/
 │   └── images/
 │       ├── validated_temperature_field.png
 │       └── validated_OH_field.png
-├── FGMTableBuild_OF7_premixed/
+├── FGMScripts_OF7_premixed_v6_zeroVarPV/
 │   ├── make_03_testcase_premixed_tables_from_scratch.sh
 │   ├── make_03_testcase_tables_from_existing_premixed_flamelets.sh
 │   ├── upgrade_current_working_tables_to_zeroVarPV_true.sh
