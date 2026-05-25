@@ -1,4 +1,0 @@
-rm *.yaml
-rm *.csv
-python3 generate1DFlamelets.py
-python3 organizeData.py

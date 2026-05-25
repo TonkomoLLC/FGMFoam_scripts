@@ -1,43 +1,33 @@
-# Warning this is not yet fully working!
+# FGMFoam for OpenFOAM 7
 
-But if you want to build FGM tables, maybe this work will inspire you.
+# FGMFoam-Delft
 
-# Compiling the solver
+[Original source code] ( https://www.tfd.chalmers.se/~hani/kurser/OS_CFD/ ): Description of the reacting flow solver FGMFoam, Michael Bertsch
 
-1. Install OpenFOAM v7
+To compile:
 
-2. copy `applications` to $HOME/OpenFOAM/<username>-7/
+1. Setup OpenFOAM 7 on your computer
 
-3. from `solvers/FGMFoam/src` run `./Allwmake'
+2. Place the FGMFoam source files in /home/userName-7/applications/solvers/FGMFoam. There should be two subdirectories, `applications` and `src`
 
-# Making the tables
-
-1. Install Cantera 3.2 (3.1 should also work)
-
-2. Build the the tables. The tables will automatically copy to `03_testcase/constant/tables`
+From within `src`, 
 
 ```
-cd 1DFlameletFiles
-./Allrun
+source .bashrc
+./Allwmake
 ```
 
-# Run the case
+# OF7_FGM_run_workflow_2D
+
+**2D flamelet tables**
 
 ```
+./make_03_testcase_premixed_tables_from_scratch.sh
 cd 03_testcase
 FGMFoam
+FGMFoamPost -latestTime
 ```
 
-# Issues
-
-1. Result doesn't look like the Sandia D flame!
-
-But at least this runs... 
 
 
-# Then... 
-
-A. Migrate to OF10, 13+, and/or OFv2512
-
-B. Build a solution for FGSFoam? 
 

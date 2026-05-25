@@ -1,0 +1,117 @@
+./make_03_testcase_premixed_tables_from_scratch.sh 
+[SETUP] Premixed CH4/air FreeFlame manifold; Cantera=3.2.0
+[SETUP] Z axis: 0 <= Z <= 0.1559; stoichiometric Z=0.055166414
+[SETUP] Solving flame profiles for 53 candidate Z values
+[OK] Z=0.055166414, phi=1, Tmax=2227.24 K, Su=0.370053 m/s -> premixed_Z_0p05516641.yaml
+[OK] Z=0.056124, phi=1.0184, Tmax=2233.96 K, Su=0.373828 m/s -> premixed_Z_0p05612400.yaml
+[OK] Z=0.053006, phi=0.95865, Tmax=2196.03 K, Su=0.357708 m/s -> premixed_Z_0p05300600.yaml
+[OK] Z=0.059242, phi=1.0785, Tmax=2214.82 K, Su=0.376392 m/s -> premixed_Z_0p05924200.yaml
+[OK] Z=0.049888, phi=0.89929, Tmax=2132.39 K, Su=0.330135 m/s -> premixed_Z_0p04988800.yaml
+[OK] Z=0.06236, phi=1.1391, Tmax=2177.10 K, Su=0.362051 m/s -> premixed_Z_0p06236000.yaml
+[OK] Z=0.04677, phi=0.84033, Tmax=2054.34 K, Su=0.29491 m/s -> premixed_Z_0p04677000.yaml
+[OK] Z=0.065478, phi=1.2, Tmax=2129.65 K, Su=0.327398 m/s -> premixed_Z_0p06547800.yaml
+[OK] Z=0.043652, phi=0.78175, Tmax=1967.39 K, Su=0.253268 m/s -> premixed_Z_0p04365200.yaml
+[OK] Z=0.04293, phi=0.76824, Tmax=1946.80 K, Su=0.243108 m/s -> premixed_Z_0p04293000.yaml
+[OK] Z=0.068596, phi=1.2614, Tmax=2080.22 K, Su=0.272386 m/s -> premixed_Z_0p06859600.yaml
+[OK] Z=0.040534, phi=0.72355, Tmax=1874.23 K, Su=0.208174 m/s -> premixed_Z_0p04053400.yaml
+[OK] Z=0.071714, phi=1.3231, Tmax=2031.99 K, Su=0.205475 m/s -> premixed_Z_0p07171400.yaml
+[OK] Z=0.037416, phi=0.66573, Tmax=1776.20 K, Su=0.161804 m/s -> premixed_Z_0p03741600.yaml
+[OK] Z=0.074832, phi=1.3853, Tmax=1983.59 K, Su=0.145487 m/s -> premixed_Z_0p07483200.yaml
+[OK] Z=0.034298, phi=0.60828, Tmax=1674.34 K, Su=0.117226 m/s -> premixed_Z_0p03429800.yaml
+[OK] Z=0.07795, phi=1.4479, Tmax=1944.22 K, Su=0.116053 m/s -> premixed_Z_0p07795000.yaml
+[OK] Z=0.03118, phi=0.55121, Tmax=1569.63 K, Su=0.0773314 m/s -> premixed_Z_0p03118000.yaml
+[OK] Z=0.081068, phi=1.5109, Tmax=1905.33 K, Su=0.0978426 m/s -> premixed_Z_0p08106800.yaml
+[OK] Z=0.028062, phi=0.49449, Tmax=1461.29 K, Su=0.0440679 m/s -> premixed_Z_0p02806200.yaml
+[OK] Z=0.084186, phi=1.5744, Tmax=1868.68 K, Su=0.0841861 m/s -> premixed_Z_0p08418600.yaml
+[OK] Z=0.024944, phi=0.43814, Tmax=1350.23 K, Su=0.0209928 m/s -> premixed_Z_0p02494400.yaml
+[OK] Z=0.087304, phi=1.6383, Tmax=1834.93 K, Su=0.0737522 m/s -> premixed_Z_0p08730400.yaml
+[OK] Z=0.021826, phi=0.38215, Tmax=1235.52 K, Su=0.0083897 m/s -> premixed_Z_0p02182600.yaml
+[OK] Z=0.090422, phi=1.7026, Tmax=1802.42 K, Su=0.0649974 m/s -> premixed_Z_0p09042200.yaml
+[OK] Z=0.018708, phi=0.32652, Tmax=1116.83 K, Su=0.00258366 m/s -> premixed_Z_0p01870800.yaml
+[OK] Z=0.09354, phi=1.7674, Tmax=1771.06 K, Su=0.0575125 m/s -> premixed_Z_0p09354000.yaml
+[SKIP] Z=0.01559, phi=0.27124: outside solve interval
+[OK] Z=0.096658, phi=1.8326, Tmax=1741.81 K, Su=0.0511447 m/s -> premixed_Z_0p09665800.yaml
+[SKIP] Z=0.012472, phi=0.21631: outside solve interval
+[OK] Z=0.099776, phi=1.8983, Tmax=1715.83 K, Su=0.0464797 m/s -> premixed_Z_0p09977600.yaml
+[SKIP] Z=0.009354, phi=0.16172: outside solve interval
+[OK] Z=0.102894, phi=1.9644, Tmax=1689.81 K, Su=0.0417665 m/s -> premixed_Z_0p10289400.yaml
+[SKIP] Z=0.006236, phi=0.10747: outside solve interval
+[OK] Z=0.106012, phi=2.031, Tmax=1665.64 K, Su=0.0376882 m/s -> premixed_Z_0p10601200.yaml
+[SKIP] Z=0.003118, phi=0.053569: outside solve interval
+[OK] Z=0.10913, phi=2.098, Tmax=1642.72 K, Su=0.0341213 m/s -> premixed_Z_0p10913000.yaml
+[SKIP] Z=0, phi=0: outside solve interval
+[OK] Z=0.112248, phi=2.1655, Tmax=1621.33 K, Su=0.030996 m/s -> premixed_Z_0p11224800.yaml
+[OK] Z=0.115366, phi=2.2335, Tmax=1600.87 K, Su=0.0281725 m/s -> premixed_Z_0p11536600.yaml
+[OK] Z=0.118484, phi=2.302, Tmax=1582.29 K, Su=0.025721 m/s -> premixed_Z_0p11848400.yaml
+[OK] Z=0.121602, phi=2.371, Tmax=1565.36 K, Su=0.0236107 m/s -> premixed_Z_0p12160200.yaml
+[SKIP] Z=0.12472, phi=2.4404: outside solve interval
+[SKIP] Z=0.127838, phi=2.5104: outside solve interval
+[SKIP] Z=0.130956, phi=2.5809: outside solve interval
+[SKIP] Z=0.134074, phi=2.6518: outside solve interval
+[SKIP] Z=0.137192, phi=2.7233: outside solve interval
+[SKIP] Z=0.14031, phi=2.7953: outside solve interval
+[SKIP] Z=0.143428, phi=2.8678: outside solve interval
+[SKIP] Z=0.146546, phi=2.9409: outside solve interval
+[SKIP] Z=0.149664, phi=3.0144: outside solve interval
+[SKIP] Z=0.152782, phi=3.0886: outside solve interval
+[SKIP] Z=0.1559, phi=3.1632: outside solve interval
+[DONE] Solved 36 premixed flamelet(s); manifest: /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/1DPremixedFlameletFiles/premixed_manifest.csv
+[NOTE] Unsolved nonflammable/rich endpoints are filled as zero-source thermochemical branches by the table builder.
+[OK] post_premixed_Z_0p01870800.csv: Z=0.018708, points=85, T=[294.00,1116.83] K, PV=[1.417536e-06,1.166653e-02], max SourcePV=5.192052e-03
+[OK] post_premixed_Z_0p02182600.csv: Z=0.021826, points=92, T=[294.00,1235.52] K, PV=[2.416823e-07,1.361472e-02], max SourcePV=4.924262e-02
+[OK] post_premixed_Z_0p02494400.csv: Z=0.024944, points=100, T=[294.00,1350.23] K, PV=[5.211305e-09,1.555484e-02], max SourcePV=3.676030e-01
+[OK] post_premixed_Z_0p02806200.csv: Z=0.028062, points=109, T=[294.00,1461.29] K, PV=[1.079756e-10,1.749927e-02], max SourcePV=1.522947e+00
+[OK] post_premixed_Z_0p03118000.csv: Z=0.03118, points=107, T=[294.00,1569.63] K, PV=[6.342245e-10,1.943071e-02], max SourcePV=4.149280e+00
+[OK] post_premixed_Z_0p03429800.csv: Z=0.034298, points=111, T=[294.00,1674.34] K, PV=[5.575093e-11,2.136719e-02], max SourcePV=8.651886e+00
+[OK] post_premixed_Z_0p03741600.csv: Z=0.037416, points=120, T=[294.00,1776.20] K, PV=[2.558106e-10,2.329036e-02], max SourcePV=1.519515e+01
+[OK] post_premixed_Z_0p04053400.csv: Z=0.040534, points=118, T=[294.00,1874.23] K, PV=[2.863434e-10,2.520162e-02], max SourcePV=2.367107e+01
+[OK] post_premixed_Z_0p04293000.csv: Z=0.04293, points=121, T=[294.00,1946.80] K, PV=[1.129759e-10,2.666054e-02], max SourcePV=3.121071e+01
+[OK] post_premixed_Z_0p04365200.csv: Z=0.043652, points=119, T=[294.00,1967.39] K, PV=[2.457096e-09,2.709405e-02], max SourcePV=3.357523e+01
+[OK] post_premixed_Z_0p04677000.csv: Z=0.04677, points=115, T=[294.00,2054.34] K, PV=[1.192706e-09,2.894550e-02], max SourcePV=4.419623e+01
+[OK] post_premixed_Z_0p04988800.csv: Z=0.049888, points=117, T=[294.00,2132.39] K, PV=[6.929820e-10,3.073912e-02], max SourcePV=5.432374e+01
+[OK] post_premixed_Z_0p05300600.csv: Z=0.053006, points=117, T=[294.00,2196.03] K, PV=[4.819373e-10,3.241696e-02], max SourcePV=6.290298e+01
+[OK] post_premixed_Z_0p05516641.csv: Z=0.055166414, points=125, T=[294.00,2227.24] K, PV=[9.461201e-12,3.348060e-02], max SourcePV=6.726559e+01
+[OK] post_premixed_Z_0p05612400.csv: Z=0.056124, points=125, T=[294.00,2233.96] K, PV=[9.189929e-12,3.388016e-02], max SourcePV=6.863587e+01
+[OK] post_premixed_Z_0p05924200.csv: Z=0.059242, points=119, T=[294.00,2214.82] K, PV=[4.738911e-10,3.472922e-02], max SourcePV=7.011858e+01
+[OK] post_premixed_Z_0p06236000.csv: Z=0.06236, points=125, T=[294.00,2177.10] K, PV=[7.395219e-10,3.528132e-02], max SourcePV=6.628548e+01
+[OK] post_premixed_Z_0p06547800.csv: Z=0.065478, points=128, T=[294.00,2129.65] K, PV=[1.778705e-09,3.557333e-02], max SourcePV=5.644277e+01
+[OK] post_premixed_Z_0p06859600.csv: Z=0.068596, points=126, T=[294.00,2080.22] K, PV=[7.180329e-09,3.571115e-02], max SourcePV=4.161821e+01
+[OK] post_premixed_Z_0p07171400.csv: Z=0.071714, points=128, T=[294.00,2031.99] K, PV=[2.137543e-09,3.575760e-02], max SourcePV=2.588489e+01
+[OK] post_premixed_Z_0p07483200.csv: Z=0.074832, points=112, T=[294.00,1983.59] K, PV=[2.587614e-08,3.592670e-02], max SourcePV=1.388253e+01
+[OK] post_premixed_Z_0p07795000.csv: Z=0.07795, points=106, T=[294.00,1944.22] K, PV=[1.064407e-07,3.622813e-02], max SourcePV=9.050976e+00
+[OK] post_premixed_Z_0p08106800.csv: Z=0.081068, points=95, T=[294.00,1905.33] K, PV=[2.822189e-07,3.638573e-02], max SourcePV=6.515738e+00
+[OK] post_premixed_Z_0p08418600.csv: Z=0.084186, points=97, T=[294.00,1868.68] K, PV=[1.199997e-08,3.646024e-02], max SourcePV=4.877476e+00
+[OK] post_premixed_Z_0p08730400.csv: Z=0.087304, points=92, T=[294.00,1834.93] K, PV=[2.932970e-08,3.658031e-02], max SourcePV=3.761341e+00
+[OK] post_premixed_Z_0p09042200.csv: Z=0.090422, points=95, T=[294.00,1802.42] K, PV=[6.549135e-08,3.666219e-02], max SourcePV=2.927124e+00
+[OK] post_premixed_Z_0p09354000.csv: Z=0.09354, points=95, T=[294.00,1771.06] K, PV=[1.360494e-07,3.671015e-02], max SourcePV=2.282464e+00
+[OK] post_premixed_Z_0p09665800.csv: Z=0.096658, points=94, T=[294.00,1741.81] K, PV=[2.639799e-07,3.673974e-02], max SourcePV=1.800242e+00
+[OK] post_premixed_Z_0p09977600.csv: Z=0.099776, points=84, T=[294.00,1715.83] K, PV=[4.691944e-07,3.683926e-02], max SourcePV=1.452373e+00
+[OK] post_premixed_Z_0p10289400.csv: Z=0.102894, points=79, T=[294.00,1689.81] K, PV=[7.963940e-07,3.682623e-02], max SourcePV=1.157650e+00
+[OK] post_premixed_Z_0p10601200.csv: Z=0.106012, points=81, T=[294.00,1665.64] K, PV=[1.291028e-06,3.679833e-02], max SourcePV=9.360338e-01
+[OK] post_premixed_Z_0p10913000.csv: Z=0.10913, points=82, T=[294.00,1642.72] K, PV=[2.006756e-06,3.674008e-02], max SourcePV=7.575335e-01
+[OK] post_premixed_Z_0p11224800.csv: Z=0.112248, points=86, T=[294.00,1621.33] K, PV=[3.004409e-06,3.666856e-02], max SourcePV=6.180925e-01
+[OK] post_premixed_Z_0p11536600.csv: Z=0.115366, points=85, T=[294.00,1600.87] K, PV=[2.277190e-06,3.653431e-02], max SourcePV=5.019831e-01
+[OK] post_premixed_Z_0p11848400.csv: Z=0.118484, points=83, T=[294.00,1582.29] K, PV=[3.411835e-06,3.643296e-02], max SourcePV=4.145750e-01
+[OK] post_premixed_Z_0p12160200.csv: Z=0.121602, points=79, T=[294.00,1565.36] K, PV=[4.888348e-06,3.634188e-02], max SourcePV=3.465448e-01
+[DONE] Processed 36 premixed flamelet file(s).
+/home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/scripts/fgm_common.py:86: UserWarning: ChemEquil::equilibrate: Temperature (293.9999998759021 K) outside valid range of 300 K to 3000 K
+  gas.equilibrate("HP")
+[OK] Wrote premixed table archive: /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/FGMTableBuild_OF7_premixed/02_tables_of7_premixed.tar.xz
+[OK] Z_param range: 0 to 0.1559; stoichiometric Z=0.055166414
+[OK] PV range: 0.000000e+00 to 3.559670e-02; SourcePV max=7.009156e+01
+[REPORT] Near Z=0.043652 (requested 0.04293): max SourcePV=3.352120e+01 at scaledPV=0.8200, T=1557.85 K
+[BACKUP] /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tables -> /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tables.before_premixed_FGM_20260524_225933
+[BACKUP] /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tableProperties -> /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tableProperties.before_premixed_FGM_20260524_225933
+[BACKUP] /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/PVtableProperties -> /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/PVtableProperties.before_premixed_FGM_20260524_225933
+[OK] Wrote OpenFOAM-7 variance-neutral nested tables to /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tables
+[OK] Required runtime tables present: T, psi, mu, alpha, SourcePV, PVmin, PVmax
+[REQUIRED] In FGMModelCoeffs, set useProgressVariableVariance false for these tables.
+[OK] Table directory: /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tables
+[OK] FGM field topology: (5, 51, 5, 51); PV bounds topology: (5, 51)
+[OK] Z_param coverage: 0 to 0.1559; requested case Z values are bracketed.
+[OK] Nearest pilot row: Z=0.043652, max SourcePV=3.352120e+01 at scaledPV=0.82
+[OK] OpenFOAM-7 constructor names and nested tables are consistent.
+[OK] Set FGM variance switches false where present in /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/combustionProperties
+[DONE] Premixed OpenFOAM-7 tables installed at: /home/eadaymo/OpenFOAM/eadaymo-7/run/OF7_FGM_run_workflow/03_testcase/constant/tables
+[DONE] Z axis is 0 to 0.1559 and brackets pilot Z=0.04293 and main-inlet Z=0.1559.
+[NEXT] Remove nonzero time directories and run from the 0 directory before comparing to the original table case.
