@@ -4,7 +4,7 @@
 
 (https://www.tfd.chalmers.se/~hani/kurser/OS_CFD/ ): Description of the reacting flow solver FGMFoam, Michael Bertsch
 
-# Place_in_userName-7_applications_solvers - Source code ready to compile on OpenFOAM 7
+# Compilation with OpenFOAM 7
 
 To compile:
 
@@ -21,9 +21,9 @@ source bashrc
 ./Allwmake
 ```
 
-# OF7_FGM_run_workflow_2D
+# Workflow 
 
-**2D flamelet tables**
+## 2D flamelet tables**
 
 ```
 ./make_03_testcase_premixed_tables_from_scratch.sh
@@ -32,9 +32,7 @@ FGMFoam
 FGMFoamPost -latestTime
 ```
 
-# OF7_FGM_run_workflow
-
-**4D flamelet tables**
+## 4D flamelet tables**
 
 Technically, 4D in OpenFOAM storage and lookup interface, but still 2D in physical manifold content: it resolves Z and scaled progress variable c, while the Z-variance and progress-variable-variance axes are replicated zero-variance slices.
 
