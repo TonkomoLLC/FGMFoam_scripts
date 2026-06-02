@@ -1,6 +1,6 @@
 # FGMFoam for OpenFOAM 7
 
-# Original_Source_Code
+# Original Source Code
 
 (https://www.tfd.chalmers.se/~hani/kurser/OS_CFD/ ): Description of the reacting flow solver FGMFoam, Michael Bertsch
 
