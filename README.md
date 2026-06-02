@@ -23,7 +23,7 @@ source bashrc
 
 # Workflow 
 
-## 2D flamelet tables**
+## 2D flamelet tables
 
 ```
 ./make_03_testcase_premixed_tables_from_scratch.sh
@@ -32,7 +32,7 @@ FGMFoam
 FGMFoamPost -latestTime
 ```
 
-## 4D flamelet tables**
+## 4D flamelet tables
 
 Technically, 4D in OpenFOAM storage and lookup interface, but still 2D in physical manifold content: it resolves Z and scaled progress variable c, while the Z-variance and progress-variable-variance axes are replicated zero-variance slices.
 
